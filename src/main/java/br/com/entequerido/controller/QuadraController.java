@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
-import br.com.entequerido.Repository.QuadraRepository;
 import br.com.entequerido.model.Quadra;
+import br.com.entequerido.repository.QuadraRepository;
+import br.com.entequerido.util.Caminhos;
 
 @RestController
 @RequestMapping("/ws/quadra")
@@ -23,18 +24,16 @@ public class QuadraController {
 	@Autowired
 	private QuadraRepository quadraRepository;
 	
-	@RequestMapping(value="/salvarQuadra", method=RequestMethod.POST)
-	public String salvarCidade(@Valid @RequestBody Quadra quadra) {
+	@RequestMapping(value=Caminhos.SALVAR_QUADRA, method=RequestMethod.POST)
+	public String salvarQuadra(@Valid @RequestBody Quadra quadra) {
 		return new Gson().toJson(quadraRepository.save(quadra));
 	}
 	
-	//FIXME: Usar um de exemplo, mas n terá busca por quadra
-	@RequestMapping(value="/buscarQuadra", method=RequestMethod.GET)
-	public String buscarQuadra(@RequestParam(value="idCidade") Integer idCidade) {
-		List<Quadra> listaCemiterio = new ArrayList<Quadra>();
+	@RequestMapping(value=Caminhos.BUSCAR_RUA_QUADRA, method=RequestMethod.GET)
+	public String buscarQuadra(@RequestParam(value="nome") Integer nome) {
+		List<Quadra> listaQuadra = new ArrayList<Quadra>();
+		listaQuadra.addAll(quadraRepository.findAll());
 		
-//		listaCemiterio.addAll(quadraBusiness.findAll());
-		
-		return new Gson().toJson(listaCemiterio);
+		return new Gson().toJson(listaQuadra);
 	}
 }

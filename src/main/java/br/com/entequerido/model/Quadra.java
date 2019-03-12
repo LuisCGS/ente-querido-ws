@@ -1,8 +1,11 @@
 package br.com.entequerido.model;
 
+import javax.validation.constraints.NotBlank;
+
 import com.google.gson.Gson;
 
 public class Quadra extends Generico{
+	@NotBlank(message="Por favor, informe o nome da quadra")
 	private String nome;
 	
 	public Quadra() {

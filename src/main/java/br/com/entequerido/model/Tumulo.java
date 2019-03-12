@@ -3,24 +3,24 @@ package br.com.entequerido.model;
 import java.util.List;
 
 public class Tumulo extends Generico {
-	private Endereco endereco;
+	private Rua endereco;
 	private List<Pessoa> listaPessoa;
 	
 	public Tumulo() {
 		super();
 	}
 	
-	public Tumulo(String codigo,  Endereco endereco, List<Pessoa> listaPessoa) {
+	public Tumulo(String codigo,  Rua endereco, List<Pessoa> listaPessoa) {
 		super(codigo);
 		this.endereco = endereco;
 		this.listaPessoa = listaPessoa;
 	}
 
-	public Endereco getEndereco() {
+	public Rua getEndereco() {
 		return endereco;
 	}
 
-	public void setEndereco(Endereco endereco) {
+	public void setEndereco(Rua endereco) {
 		this.endereco = endereco;
 	}
 
