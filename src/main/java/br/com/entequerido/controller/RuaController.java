@@ -22,7 +22,7 @@ import br.com.entequerido.model.Quadra;
 @RequestMapping("/ws/rua")
 public class RuaController {
 	@Autowired
-	private RuaRepository enderecoRepository;
+	private RuaRepository ruaRepository;
 	
 	@Autowired
 	private QuadraRepository quadraRepository;
@@ -47,7 +47,7 @@ public class RuaController {
 				}
 				
 				rua.setQuadra(quadra);
-				return new Gson().toJson(enderecoRepository.save(rua));
+				return new Gson().toJson(ruaRepository.save(rua));
 			} else {
 				return Util.montarRetornoErro("mensagem.erro.quadra.codigo", Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA)); 
 			}
@@ -66,7 +66,7 @@ public class RuaController {
 	 */
 	@RequestMapping(value=Caminhos.BUSCAR_RUA_NOME, method=RequestMethod.GET)
 	public String buscarRuaPorNome(@RequestParam String rua) {
-		return new Gson().toJson(enderecoRepository.findByRua(rua));
+		return new Gson().toJson(ruaRepository.findByRuaLikeIgnoreCase(rua));
 	}
 	
 	/**
@@ -79,6 +79,6 @@ public class RuaController {
 	 */
 	@RequestMapping(value=Caminhos.BUSCAR_RUA_QUADRA, method=RequestMethod.GET)
 	public String buscarRuaPorQuadra(@RequestParam String nomeQuadra) {
-		return new Gson().toJson(enderecoRepository.findByQuadra(new Quadra(null, nomeQuadra)));
+		return new Gson().toJson(ruaRepository.findByQuadraLikeIgnoreCase(new Quadra(null, nomeQuadra)));
 	}
 }

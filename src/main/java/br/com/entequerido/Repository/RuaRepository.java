@@ -9,6 +9,6 @@ import br.com.entequerido.model.Rua;
 import br.com.entequerido.model.Quadra;
 
 public interface RuaRepository extends MongoRepository<Rua, String>{
-	List<Rua> findByQuadra(@Param(value = "quadra") Quadra quadra);
-	List<Rua> findByRua(@Param(value="rua") String rua);
+	List<Rua> findByQuadraLikeIgnoreCase(@Param(value = "quadra") Quadra quadra);
+	List<Rua> findByRuaLikeIgnoreCase(@Param(value="rua") String rua);
 }
