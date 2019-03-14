@@ -1,12 +1,16 @@
 package br.com.entequerido.model;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-import com.google.gson.Gson;
+import br.com.entequerido.util.Util;
 
-public class Quadra extends Generico{
+public class Quadra extends Generico {
 	@NotBlank(message="Por favor, informe o nome da quadra")
 	private String nome;
+	
+	@NotNull(message="Por favor, informe os dados do cemiterio, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Cemiterio A'}")
+	private Cemiterio cemiterio;
 	
 	public Quadra() {
 		super();
@@ -27,6 +31,6 @@ public class Quadra extends Generico{
 	
 	@Override
 	public String toString() {
-		return new Gson().toJson(this);
+		return Util.gson.toJson(this);
 	}
 }

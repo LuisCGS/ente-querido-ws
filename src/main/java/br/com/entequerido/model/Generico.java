@@ -2,10 +2,12 @@ package br.com.entequerido.model;
 
 import org.springframework.data.annotation.Id;
 
+import br.com.entequerido.util.Util;
+
 public class Generico {
 	@Id
 	private String codigo;
-
+	
 	public Generico() {
 		super();
 	}
@@ -46,5 +48,10 @@ public class Generico {
 		} else if (!codigo.equals(other.codigo))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return Util.gson.toJson(this);
 	}
 }

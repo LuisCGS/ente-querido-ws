@@ -24,11 +24,27 @@ public class QuadraController {
 	@Autowired
 	private QuadraRepository quadraRepository;
 	
+	/**
+	 * Metodos responsavel por salvar uma {@link Quadra} 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 13/03/2019 - 03:52 </i>
+	 * @param quadra : {@link Quadra}
+	 * @return {@link String}
+	 */
 	@RequestMapping(value=Caminhos.SALVAR_QUADRA, method=RequestMethod.POST)
 	public String salvarQuadra(@Valid @RequestBody Quadra quadra) {
 		return new Gson().toJson(quadraRepository.save(quadra));
 	}
 	
+	/**
+	 * Metodos responsavel por buscar {@link Quadra} 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 13/03/2019 - 03:53 </i>
+	 * @param nome : {@link Integer}
+	 * @return {@link String}
+	 */
 	@RequestMapping(value=Caminhos.BUSCAR_RUA_QUADRA, method=RequestMethod.GET)
 	public String buscarQuadra(@RequestParam(value="nome") Integer nome) {
 		List<Quadra> listaQuadra = new ArrayList<Quadra>();

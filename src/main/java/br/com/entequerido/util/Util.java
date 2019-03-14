@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 public final class Util {
 	public static final ResourceBundle bundleMensagens = ResourceBundle.getBundle("mensagens");
 	public static final ResourceBundle bundleConfig = ResourceBundle.getBundle("configuracoes");
+	public static final Gson gson = new Gson();
 	
 	/**
 	 * Metodo responsavel por validar o atributo identificador do servidor {@link UUID}
@@ -154,6 +155,25 @@ public final class Util {
 		map.put("error", HttpStatus.BAD_REQUEST.name());
 		map.put("message", mensagem);
 		map.put("path", caminho);
+		
+		return new Gson().toJson(map);
+	}
+	
+	/**
+	 * Metodos responsavel por retornar uma mensagem de sucesso! 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 13/03/2019 - 01:24 </i>
+	 * @param mensagem : {@link String} - codigo que esta no arquivo mensagens
+	 * @param entidade : {@link String} - entidade que foi executada
+	 * @return {@link String}
+	 */
+	public static String montarRetornoSucesso(String mensagem, String entidade) {
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("timestamp", new Date().toString());
+		map.put("status", Integer.toString(HttpStatus.ACCEPTED.value()));
+		map.put("message", bundleMensagens.getString(mensagem).replace("{0}", entidade));
 		
 		return new Gson().toJson(map);
 	}
