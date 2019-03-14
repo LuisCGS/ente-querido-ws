@@ -28,11 +28,11 @@ public class Rua extends Generico {
 	}
 	
 
-	public String getRua() {
+	public String getNome() {
 		return nome;
 	}
 
-	public void setRua(String nome) {
+	public void setNome(String nome) {
 		this.nome = nome;
 	}
 

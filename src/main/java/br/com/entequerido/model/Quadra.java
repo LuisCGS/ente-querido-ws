@@ -29,6 +29,14 @@ public class Quadra extends Generico {
 		this.nome = nome;
 	}
 	
+	public Cemiterio getCemiterio() {
+		return cemiterio;
+	}
+
+	public void setCemiterio(Cemiterio cemiterio) {
+		this.cemiterio = cemiterio;
+	}
+
 	@Override
 	public String toString() {
 		return Util.gson.toJson(this);

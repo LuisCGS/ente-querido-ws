@@ -34,6 +34,7 @@ public class QuadraController {
 	 */
 	@RequestMapping(value=Caminhos.SALVAR_QUADRA, method=RequestMethod.POST)
 	public String salvarQuadra(@Valid @RequestBody Quadra quadra) {
+		System.out.println(quadra);
 		return new Gson().toJson(quadraRepository.save(quadra));
 	}
 	

@@ -6,16 +6,18 @@ public class Pessoa extends Generico{
 	private String nome;
 	private Date dataNascimento;
 	private Date dataFalecimento;
+	private Tumulo tumulo;
 	
 	public Pessoa() {
 		super();
 	}
 	
-	public Pessoa(String codigo, String nome, Date dataNascimento, Date dataFalecimento) {
+	public Pessoa(String codigo, String nome, Date dataNascimento, Date dataFalecimento, Tumulo tumulo) {
 		super(codigo);
 		this.nome = nome;
 		this.dataNascimento = dataNascimento;
 		this.dataFalecimento = dataFalecimento;
+		this.tumulo = tumulo;
 	}
 
 
@@ -41,5 +43,13 @@ public class Pessoa extends Generico{
 
 	public void setDataFalecimento(Date dataFalecimento) {
 		this.dataFalecimento = dataFalecimento;
+	}
+
+	public Tumulo getTumulo() {
+		return tumulo;
+	}
+
+	public void setTumulo(Tumulo tumulo) {
+		this.tumulo = tumulo;
 	}
 }

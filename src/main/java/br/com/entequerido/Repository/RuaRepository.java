@@ -9,14 +9,15 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
 
 import br.com.entequerido.model.Rua;
+import br.com.entequerido.util.Parametros;
 
 public interface RuaRepository extends MongoRepository<Rua, String>{
-	List<Rua> findByNomeOrCodigo(@Param(value="nome") String nome, @Param(value="codigo") String codigo);
-	List<Rua> findRuaByQuadraNomeLikeIgnoreCase(@Param(value = "nome") String nomeQuadra, Sort sort);
-	Page<Rua> findRuaByQuadraNomeLikeIgnoreCase(@Param(value="nome") String nome, Pageable pageable);
+	Rua findByNomeOrCodigo(@Param(value=Parametros.RUA_NOME) String nome, @Param(value=Parametros.RUA_CODIGO) String codigo);
+	List<Rua> findRuaByQuadraNomeLikeIgnoreCase(@Param(value = Parametros.RUA_NOME) String nomeQuadra, Sort sort);
+	Page<Rua> findRuaByQuadraNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Pageable pageable);
 	
-	List<Rua> findByNomeLikeIgnoreCase(@Param(value="nome") String nome, Sort sort);
-	Page<Rua> findByNomeLikeIgnoreCase(@Param(value="nome") String nome, Pageable pageable);
+	List<Rua> findByNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Sort sort);
+	Page<Rua> findByNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Pageable pageable);
 	
-	long countByQuadraNomeIgnoreCase(@Param(value="nome") String nomeQuadra);
+	long countByQuadraNomeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nomeQuadra);
 }

@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
 
@@ -126,16 +128,34 @@ public final class Util {
 	 * @param caminho : {@link String}
 	 * @return {@link String}
 	 */
-	public static String montarRetornoErro(String codigoMensagem, String caminho) {
+	public static String montarRetornoErro(String codigoMensagem, String caminho,  String ... parametros) {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		map.put("timestamp", new Date().toString());
 		map.put("status", Integer.toString(HttpStatus.BAD_REQUEST.value()));
 		map.put("error", HttpStatus.BAD_REQUEST.name());
-		map.put("message", bundleMensagens.getString(codigoMensagem));
+		map.put("message", montarMensagemParametrizado(codigoMensagem, parametros));
 		map.put("path", caminho);
 		
 		return new Gson().toJson(map);
+	}
+
+	/** Metodos responsavel por montar mensagem sobreescrevendo os parametros
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 14/03/2019 - 11:24 </i>
+	 * @param codigoMensagem : {@link String}
+	 * @param parametros : {@link String}[]
+	 * @return {@link String}
+	 */
+	private static String montarMensagemParametrizado(String codigoMensagem, String... parametros) {
+		String mensagem = bundleMensagens.getString(codigoMensagem);
+		
+		for (int i = 0; i < parametros.length; i++) {
+			mensagem = mensagem.replace(("{" + i + "}"), parametros[i]);
+		}
+		
+		return mensagem;
 	}
 	
 	/**
@@ -164,17 +184,28 @@ public final class Util {
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 13/03/2019 - 01:24 </i>
-	 * @param mensagem : {@link String} - codigo que esta no arquivo mensagens
+	 * @param codigoMensagem : {@link String} - codigo que esta no arquivo mensagens
 	 * @param entidade : {@link String} - entidade que foi executada
 	 * @return {@link String}
 	 */
-	public static String montarRetornoSucesso(String mensagem, String entidade) {
+	public static String montarRetornoSucesso(String codigoMensagem, String ... parametros) {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		map.put("timestamp", new Date().toString());
 		map.put("status", Integer.toString(HttpStatus.ACCEPTED.value()));
-		map.put("message", bundleMensagens.getString(mensagem).replace("{0}", entidade));
+		map.put("message", montarMensagemParametrizado(codigoMensagem, parametros));
 		
 		return new Gson().toJson(map);
+	}
+	
+	/** Metodos responsavel por verificar a ordem informada pelo {@link RequestParam}
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 13/03/2019 - 12:29 </i>
+	 * @param ordem : {@link String}
+	 * @return {@link Boolean}
+	 */
+	public static Boolean verificarOrdemParametrizado(String ordem) {
+		return !ordem.equalsIgnoreCase(Direction.ASC.toString()) && !ordem.equalsIgnoreCase(Direction.DESC.toString());
 	}
 }

@@ -2,7 +2,12 @@ package br.com.entequerido.model;
 
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class Cidade extends Generico{
+	@NotBlank(message="Por favor, informe o nome da rua contendo pelo menos 3 caracteres!")
+	@Size(min=3, message="Por favor, informe um nome de rua com mais de 2 caracteres!")
 	private String nome;
 	private List<Cemiterio> listaCemiterio;
 	

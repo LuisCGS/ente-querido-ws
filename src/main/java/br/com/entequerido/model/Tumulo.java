@@ -9,15 +9,18 @@ public class Tumulo extends Generico {
 	@NotNull(message="Por favor, informe os dados da rua, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Rua A'}")
 	private Rua rua;
 	
+	private Cemiterio cemiterio;
+	
 	private List<Pessoa> listaPessoa;
 	
 	public Tumulo() {
 		super();
 	}
 	
-	public Tumulo(String codigo, Rua rua, List<Pessoa> listaPessoa) {
+	public Tumulo(String codigo, Rua rua, Cemiterio cemiterio, List<Pessoa> listaPessoa) {
 		super(codigo);
 		this.rua = rua;
+		this.cemiterio = cemiterio;
 		this.listaPessoa = listaPessoa;
 	}
 
@@ -27,6 +30,14 @@ public class Tumulo extends Generico {
 
 	public void setRua(Rua rua) {
 		this.rua = rua;
+	}
+
+	public Cemiterio getCemiterio() {
+		return cemiterio;
+	}
+
+	public void setCemiterio(Cemiterio cemiterio) {
+		this.cemiterio = cemiterio;
 	}
 
 	public List<Pessoa> getListaPessoa() {
