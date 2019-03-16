@@ -1,6 +1,7 @@
 package br.com.entequerido.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import br.com.entequerido.model.Quadra;
 import br.com.entequerido.repository.CemiterioRepository;
 import br.com.entequerido.repository.CidadeRepository;
 import br.com.entequerido.util.Caminhos;
+import br.com.entequerido.util.Parametros;
 import br.com.entequerido.util.Util;
 
 @RestController
@@ -92,6 +94,19 @@ public class CemiterioController {
 			} else {
 				return new Gson().toJson(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, PageRequest.of(pagina, tamanho, ordemSort, "nome")));
 			}
+		} catch (Exception e) {
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO));
+		}
+	}
+	
+	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_NOME_DE_CIDADE, method=RequestMethod.GET)
+	public String buscarQuantidadeCemiterioPorCidade(@RequestParam @NotBlank String codigoCidade) {
+		try {
+			if(Util.isNull(cidadeRepository.findByCodigoOrNome(codigoCidade, null))) {
+				return Util.montarRetornoErro(Parametros.men, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA), Parametros.QUADRA);
+			}
+			
+			return Long.toString(cemiterioRepository.countByCidadeCodigoOrNomeIgnoreCase(codigoCidade, null));
 		} catch (Exception e) {
 			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO));
 		}

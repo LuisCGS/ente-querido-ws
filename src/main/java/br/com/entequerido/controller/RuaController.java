@@ -148,17 +148,17 @@ public class RuaController {
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 13/03/2019 - 12:35 </i>
-	 * @param nomeQuadra : {@link String}
+	 * @param codigoQuadra : {@link String}
 	 * @return {@link String}
 	 */
-	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_RUA_POR_QUADRA, method=RequestMethod.GET)
-	public String buscarQuantidadeRuaPorQuadra(@RequestParam @NotBlank String nomeQuadra) {
+	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA, method=RequestMethod.GET)
+	public String buscarQuantidadeRuaPorQuadra(@RequestParam @NotBlank String codigoQuadra) {
 		try {
-			if(quadraRepository.findByNomeIgnoreCase(nomeQuadra).isEmpty()) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_QUADRA), Parametros.QUADRA);
+			if(Util.isNull(quadraRepository.findByNomeOrCodigo(codigoQuadra, null))){
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA), Parametros.QUADRA);
 			}
 			
-			return Long.toString(ruaRepository.countByQuadraNomeIgnoreCase(nomeQuadra));
+			return Long.toString(ruaRepository.countByQuadraCodigoOrNomeIgnoreCase(codigoQuadra, null));
 		} catch (Exception e) {
 			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_QUADRA));
 		}

@@ -38,7 +38,7 @@ public class CidadeController {
 	@RequestMapping(value=Caminhos.SALVAR_CIDADE, method=RequestMethod.POST)
 	public String salvarCidade(@Valid @RequestBody Cidade cidade) throws Exception{
 		try {
-			Cidade cidadeConsulta = cidadeRepository.findByNomeOrCodigo(cidade.getNome(), null);
+			Cidade cidadeConsulta = cidadeRepository.findByCodigoOrNome(null, cidade.getNome());
 			
 			if(Util.isNotNull(cidadeConsulta)
 					&& !cidade.equals(cidadeConsulta)) {

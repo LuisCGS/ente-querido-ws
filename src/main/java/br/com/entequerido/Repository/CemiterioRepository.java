@@ -13,4 +13,6 @@ import br.com.entequerido.model.Cemiterio;
 public interface CemiterioRepository extends MongoRepository<Cemiterio, String> {
 	List<Cemiterio> findByNomeLikeIgnoreCase(@Param(value="nome") String nome, Sort sort);
 	Page<Cemiterio> findByNomeLikeIgnoreCase(@Param(value="nome") String nome, Pageable pageable);
+	
+	long countByCidadeCodigoOrNomeIgnoreCase(@Param(value="codigo") String codigo, @Param(value="nome") String nome);
 }

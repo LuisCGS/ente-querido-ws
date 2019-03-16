@@ -7,7 +7,7 @@ public final class Caminhos {
 	public static final String BUSCAR_RUA_NOME = "/buscarRuaPorNome";
 	public static final String BUSCAR_RUA_QUADRA = "/buscarRuaPorQuadra";
 	public static final String BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO = "/buscarRuaPorNomeOrdenadoEOuPaginado";
-	public static final String BUSCAR_QUANTIDADE_RUA_POR_QUADRA = "/buscarQuantidadeRuaPorQuadra";
+	public static final String BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA = "/buscarQuantidadeRuaPorCodigoDeQuadra";
 	public static final String EXCLUIR_RUA = "/excluirRua";
 	
 	/* Caminhos de chamada para a controller de Quadra */
@@ -28,5 +28,6 @@ public final class Caminhos {
 	/* Caminhos de chamada para a controller de Cemiterio */
 	public static final String WS_CEMITERIO = "/ws/cemiterio";
 	public static final String SALVAR_CEMITERIO = "/salvarCemiterio";
+	public static final String BUSCAR_QUANTIDADE_CEMITERIO_POR_NOME_DE_CIDADE = "/buscarQuantidadeCemiterioPorNomeDeCidade";
 	public static final String BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO = "/buscarCemiterioPorNomeOrdenadoEOuPaginado";
 }
