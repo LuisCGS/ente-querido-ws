@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 
 import br.com.entequerido.model.Cidade;
+import br.com.entequerido.repository.CemiterioRepository;
 import br.com.entequerido.repository.CidadeRepository;
 import br.com.entequerido.util.Caminhos;
 import br.com.entequerido.util.Parametros;
@@ -25,6 +26,9 @@ import br.com.entequerido.util.Util;
 public class CidadeController {
 	@Autowired
 	private CidadeRepository cidadeRepository;
+	
+	@Autowired
+	private CemiterioRepository cemiterioRepository;
 	
 	/**
 	 * Metodos responsavel por salvar uma entidade {@link Cidade} 
@@ -86,4 +90,32 @@ public class CidadeController {
 		}
 	}
 	
+	/**
+	 * Metodos responsavel por deletar uma {@link Cidade} 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 16/03/2019 - 11:53 </i>
+	 * @param codigo : {@link String}
+	 * @return {@link String}
+	 */
+	@RequestMapping(value=Caminhos.EXCLUIR_CIDADE, method=RequestMethod.DELETE)
+	public String excluirCidade(@RequestParam String codigo) {
+		try {
+			Cidade cidade = cidadeRepository.findById(codigo).get();
+			
+			if(Util.isNull(cidade)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Caminhos.WS_CIDADE.concat(Caminhos.EXCLUIR_CIDADE), Parametros.CIDADE);
+			}
+			
+			if(cemiterioRepository.countByCidadeCodigoOrNome(codigo, null) > 0) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Caminhos.WS_CIDADE.concat(Caminhos.EXCLUIR_CIDADE), Parametros.CEMITERIO, Parametros.CIDADE);
+			}
+			
+			cidadeRepository.delete(cidade);
+		} catch (Exception e) {
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CIDADE.concat(Caminhos.EXCLUIR_CIDADE));
+		}
+			
+		return Util.montarRetornoSucesso(Parametros.MENSAGEM_SUCESSO_EXCLUIDA, Parametros.CIDADE);
+	}
 }

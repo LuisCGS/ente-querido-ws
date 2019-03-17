@@ -13,8 +13,8 @@ import br.com.entequerido.util.Parametros;
 
 public interface RuaRepository extends MongoRepository<Rua, String>{
 	Rua findByNomeOrCodigo(@Param(value=Parametros.RUA_NOME) String nome, @Param(value=Parametros.RUA_CODIGO) String codigo);
-	List<Rua> findRuaByQuadraNomeLikeIgnoreCase(@Param(value = Parametros.RUA_NOME) String nomeQuadra, Sort sort);
-	Page<Rua> findRuaByQuadraNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Pageable pageable);
+	List<Rua> findRuaByQuadraCodigo(@Param(value=Parametros.QUADRA_CODIGO) String codigo, Sort sort);
+	Page<Rua> findRuaByQuadraCodigo(@Param(value=Parametros.QUADRA_CODIGO) String codigo, Pageable pageable);
 	
 	List<Rua> findByNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Sort sort);
 	Page<Rua> findByNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Pageable pageable);

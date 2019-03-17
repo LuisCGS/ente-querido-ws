@@ -41,4 +41,6 @@ public final class Parametros {
 	public static final String MENSAGEM_ERRO_M_EXISTENTE = "mensagem.erro.m.existente";
 	public static final String MENSAGEM_ERRO_F_EXISTENTE = "mensagem.erro.f.existente";
 	public static final String MENSAGEM_ERRO_ORDEM_INCORRETA = "mensagem.erro.ordem.incorreta";
+	public static final String MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE = "mensagem.erro.validacao.m.atributo.classe";
+	public static final String MENSAGEM_ERRO_VALIDACAO_F_ATRIBUTO_CLASSE = "mensagem.erro.validacao.f.atributo.classe";
 }

@@ -46,7 +46,7 @@ public class QuadraController {
 	 * @param nome : {@link Integer}
 	 * @return {@link String}
 	 */
-	@RequestMapping(value=Caminhos.BUSCAR_RUA_QUADRA, method=RequestMethod.GET)
+	@RequestMapping(value=Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA, method=RequestMethod.GET)
 	public String buscarQuadra(@RequestParam(value="nome") Integer nome) {
 		List<Quadra> listaQuadra = new ArrayList<Quadra>();
 		listaQuadra.addAll(quadraRepository.findAll());

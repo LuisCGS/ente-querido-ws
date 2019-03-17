@@ -45,22 +45,21 @@ public class CemiterioController {
 	@RequestMapping(value=Caminhos.SALVAR_CEMITERIO, method=RequestMethod.POST)
 	public String salvarCemiterio(@Valid @RequestBody Cemiterio cemiterio) throws Exception{
 		try {
-			String codigoCidade = cemiterio.getCidade().getCodigo();
 			
-			if(Util.isNotBlank(codigoCidade)) {
-				Cidade cidade = cidadeRepository.findById(codigoCidade).get();
-				
-				if(Util.isNull(cidade)) {
-					return Util.montarRetornoErro("mensagem.erro.rua.quadra.inexistente", Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA));
-				}
-				
-				cemiterio.setCidade(cidade);
-				return cemiterioRepository.save(cemiterio).toString();
-			} else {
-				return Util.montarRetornoErro("mensagem.erro.rua.quadra.codigo", Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA)); 
+			Cidade cidade = cidadeRepository.findById(cemiterio.getCidade().getCodigo()).get();
+			
+			if(Util.isNull(cidade)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_F_ATRIBUTO_CLASSE, Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO), Parametros.CIDADE_CODIGO, Parametros.CIDADE);
 			}
+			
+			if(Util.isNotNull(cemiterioRepository.findByNomeIgnoreCaseAndCidadeCodigo(cemiterio.getNome(), cidade.getCodigo()))) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTENTE, Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO), Parametros.CEMITERIO);
+			}
+			
+			cemiterio.setCidade(cidade);
+			return cemiterioRepository.save(cemiterio).toString();
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO));
 		}
 	}
 	
@@ -83,32 +82,42 @@ public class CemiterioController {
 			
 			if(Util.isNotBlank(ordem)) {
 				if(Util.verificarOrdemParametrizado(ordem)) {
-					return Util.montarRetornoErro("mensagem.erro.ordem.incorreta", Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO));
+					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO));
 				}
 				
 				ordemSort = Direction.fromString(ordem);
 			} 
 			
 			if(Util.isNull(pagina) || Util.isNull(tamanho)) {
-				return new Gson().toJson(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, new Sort(ordemSort, "nome")));
+				return new Gson().toJson(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, new Sort(ordemSort, Parametros.CEMITERIO_NOME)));
 			} else {
-				return new Gson().toJson(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, PageRequest.of(pagina, tamanho, ordemSort, "nome")));
+				return new Gson().toJson(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, PageRequest.of(pagina, tamanho, ordemSort, Parametros.CEMITERIO_NOME)));
 			}
 		} catch (Exception e) {
 			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO));
 		}
 	}
 	
-	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_NOME_DE_CIDADE, method=RequestMethod.GET)
-	public String buscarQuantidadeCemiterioPorCidade(@RequestParam @NotBlank String codigoCidade) {
+	/**
+	 * Metodos responsavel por buscar a quantidade de {@link Cemiterio} por {@link Cidade} 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 16/03/2019 - 12:39 </i>
+	 * @param codigoCidade : {@link String}
+	 * @return {@link String}
+	 */
+	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE, method=RequestMethod.GET)
+	public String buscarQuantidadeCemiterioPorCodigoCidade(@RequestParam @NotBlank String codigoCidade) {
 		try {
 			if(Util.isNull(cidadeRepository.findByCodigoOrNome(codigoCidade, null))) {
-				return Util.montarRetornoErro(Parametros.men, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA), Parametros.QUADRA);
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE), Parametros.CIDADE_CODIGO, Parametros.CIDADE);
 			}
 			
-			return Long.toString(cemiterioRepository.countByCidadeCodigoOrNomeIgnoreCase(codigoCidade, null));
+			return Long.toString(cemiterioRepository.countByCidadeCodigoOrNome(codigoCidade, null));
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_CEMITERIO_POR_NOME_ORDENADO_E_OU_PAGINADO));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE));
 		}
 	}
+	
+	
 }

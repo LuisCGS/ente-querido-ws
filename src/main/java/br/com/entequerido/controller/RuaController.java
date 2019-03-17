@@ -48,26 +48,21 @@ public class RuaController {
 	@RequestMapping(value=Caminhos.SALVAR_RUA, method=RequestMethod.POST)
 	public String salvarRua(@Valid @RequestBody Rua rua) throws Exception{
 		try {
-			String codigoQuadra = rua.getQuadra().getCodigo();
+			Quadra quadra = quadraRepository.findByNomeOrCodigo(null, rua.getQuadra().getCodigo());
 			
-			if(Util.isNotBlank(codigoQuadra)) {
-				Quadra quadra = quadraRepository.findByNomeOrCodigo(null, codigoQuadra);
-				
-				if(Util.isNull(quadra)) {
-					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.QUADRA);
-				}
-				Rua ruaConsulta = ruaRepository.findByNomeOrCodigo(rua.getNome(), null);
-				
-				if(Util.isNotNull(ruaConsulta)
-						&& !rua.equals(ruaConsulta)) {
-					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTENTE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.RUA);
-				}
-				
-				rua.setQuadra(quadra);
-				return ruaRepository.save(rua).toString();
-			} else {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.RUA_CODIGO, Parametros.RUA); 
+			if(Util.isNull(quadra)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.QUADRA_CODIGO, Parametros.QUADRA);
 			}
+			
+			Rua ruaConsulta = ruaRepository.findByNomeOrCodigo(rua.getNome(), null);
+			
+			if(Util.isNotNull(ruaConsulta)
+					&& !rua.equals(ruaConsulta)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTENTE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.RUA);
+			}
+			
+			rua.setQuadra(quadra);
+			return ruaRepository.save(rua).toString();
 		} catch (Exception e) {
 			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA));
 		}
@@ -116,30 +111,36 @@ public class RuaController {
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 12/03/2019 - 04:04 </i>
-	 * @param nomeQuadra : {@link String}
+	 * @param codigoQuadra : {@link String}
 	 * @return {@link String}
 	 */
-	@RequestMapping(value=Caminhos.BUSCAR_RUA_QUADRA, method=RequestMethod.GET)
-	public String buscarRuaPorQuadra(@RequestParam String nomeQuadra, @RequestParam String ordem, 
+	@RequestMapping(value=Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA, method=RequestMethod.GET)
+	public String buscarRuaPorQuadra(@RequestParam String codigoQuadra, @RequestParam String ordem, 
 			@RequestParam Integer pagina, @RequestParam Integer tamanho) {
 		try {
 			Direction ordemSort = Direction.ASC;
 			
 			if(Util.isNotBlank(ordem)) {
 				if(Util.verificarOrdemParametrizado(ordem)) {
-					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_QUADRA));
+					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
 				}
 				
 				ordemSort = Direction.fromString(ordem);
-			} 
+			}
+			
+			Quadra quadra = quadraRepository.findByNomeOrCodigo(null, codigoQuadra);
+			
+			if(Util.isNull(quadra)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.QUADRA_CODIGO, Parametros.QUADRA);
+			}
 			
 			if(Util.isNull(pagina) || Util.isNull(tamanho)) {
-				return new Gson().toJson(ruaRepository.findRuaByQuadraNomeLikeIgnoreCase(nomeQuadra, new Sort(ordemSort, Parametros.RUA_NOME)));
+				return new Gson().toJson(ruaRepository.findRuaByQuadraCodigo(codigoQuadra, new Sort(ordemSort, Parametros.RUA_NOME)));
 			} else {
-				return new Gson().toJson(ruaRepository.findRuaByQuadraNomeLikeIgnoreCase(nomeQuadra, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
+				return new Gson().toJson(ruaRepository.findRuaByQuadraCodigo(codigoQuadra, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
 			}
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_QUADRA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
 		}
 	}
 	
@@ -160,7 +161,7 @@ public class RuaController {
 			
 			return Long.toString(ruaRepository.countByQuadraCodigoOrNomeIgnoreCase(codigoQuadra, null));
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_QUADRA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
 		}
 	}
 	
