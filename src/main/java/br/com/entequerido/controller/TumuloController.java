@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.entequerido.model.Cemiterio;
+import br.com.entequerido.model.Cidade;
 import br.com.entequerido.model.Quadra;
 import br.com.entequerido.model.Rua;
 import br.com.entequerido.model.Tumulo;
@@ -30,26 +32,39 @@ public class TumuloController {
 	@Autowired
 	private CemiterioRepository cemiterioRepository;
 	
+	/**
+	 * Metodos responsavel por salar/alterar a entidade {@link Tumulo} 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 17/03/2019 - 01:45 </i>
+	 * @param tumulo : {@link Tumulo}
+	 * @return {@link String}
+	 * @throws Exception
+	 */
 	@RequestMapping(value=Caminhos.SALVAR_TUMULO, method=RequestMethod.POST)
-	public String salvarRua(@Valid @RequestBody Tumulo tumulo) throws Exception{
+	public String salvarTumulo(@Valid @RequestBody Tumulo tumulo) throws Exception{
 		try {
-			Rua rua = ruaRepository.findByNomeOrCodigo(null, tumulo.getRua().getCodigo());
+			Cemiterio cemiterio = cemiterioRepository.findByCodigoOrNome(tumulo.getCemiterio().getCodigo(), null);
+			
+			if(Util.isNull(cemiterio)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, 
+						Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.CEMITERIO_CODIGO, Parametros.CEMITERIO);
+			}
+			
+			Rua rua = ruaRepository.findByCodigoOrNome(tumulo.getRua().getCodigo(), null);
 			
 			if(Util.isNull(rua)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.RUA_CODIGO, Parametros.RUA);
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_F_ATRIBUTO_CLASSE, 
+						Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.RUA_CODIGO, Parametros.RUA);
 			}
 			
-			Rua ruaConsulta = ruaRepository.findByNomeOrCodigo(rua.getNome(), null);
-			
-			if(Util.isNotNull(ruaConsulta)
-					&& !rua.equals(ruaConsulta)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTENTE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), Parametros.RUA);
-			}
-			
-			rua.setQuadra(quadra);
-			return ruaRepository.save(rua).toString();
+			tumulo.setCemiterio(cemiterio);
+			tumulo.setRua(rua);
+			return tumuloRepository.save(tumulo).toString();
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO));
 		}
 	}
+	
+	
 }

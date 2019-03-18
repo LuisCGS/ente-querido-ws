@@ -12,7 +12,8 @@ import br.com.entequerido.model.Rua;
 import br.com.entequerido.util.Parametros;
 
 public interface RuaRepository extends MongoRepository<Rua, String>{
-	Rua findByNomeOrCodigo(@Param(value=Parametros.RUA_NOME) String nome, @Param(value=Parametros.RUA_CODIGO) String codigo);
+	Rua findByCodigoOrNome(@Param(value=Parametros.RUA_CODIGO) String codigo, @Param(value=Parametros.RUA_NOME) String nome);
+	Rua findByNomeIgnoreCaseAndQuadraCodigo(@Param(value=Parametros.RUA_NOME) String nome, @Param(value=Parametros.QUADRA_CODIGO) String codigo);
 	List<Rua> findRuaByQuadraCodigo(@Param(value=Parametros.QUADRA_CODIGO) String codigo, Sort sort);
 	Page<Rua> findRuaByQuadraCodigo(@Param(value=Parametros.QUADRA_CODIGO) String codigo, Pageable pageable);
 	

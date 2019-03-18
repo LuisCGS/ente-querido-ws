@@ -4,13 +4,18 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 public class Tumulo extends Generico {
 	
 	@NotNull(message="Por favor, informe os dados da rua, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Rua A'}")
 	private Rua rua;
 	
+	@DBRef
+	@NotNull(message="Por favor, informe os dados do cemiterio, ou cadastre um. Ex.: {'codigo' : '123', 'nome' : 'Cemiterio A'}")
 	private Cemiterio cemiterio;
 	
+	@DBRef
 	private List<Pessoa> listaPessoa;
 	
 	public Tumulo() {

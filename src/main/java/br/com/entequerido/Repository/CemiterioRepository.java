@@ -12,9 +12,11 @@ import br.com.entequerido.model.Cemiterio;
 import br.com.entequerido.util.Parametros;
 
 public interface CemiterioRepository extends MongoRepository<Cemiterio, String> {
+	Cemiterio findByCodigoOrNome(@Param(value=Parametros.CEMITERIO_CODIGO) String codigo, @Param(value=Parametros.CEMITERIO_NOME) String nome);
+	Cemiterio findByNomeIgnoreCaseAndCidadeCodigo(@Param(value=Parametros.CEMITERIO_CODIGO) String nome, @Param(value=Parametros.CIDADE_CODIGO) String codigo);
+	
 	List<Cemiterio> findByNomeLikeIgnoreCase(@Param(value=Parametros.CEMITERIO_NOME) String nome, Sort sort);
 	Page<Cemiterio> findByNomeLikeIgnoreCase(@Param(value=Parametros.CEMITERIO_NOME) String nome, Pageable pageable);
-	Cemiterio findByNomeIgnoreCaseAndCidadeCodigo(@Param(value=Parametros.CEMITERIO_CODIGO) String nome, @Param(value=Parametros.CIDADE_CODIGO) String codigo);
 	
 	long countByCidadeCodigoOrNome(@Param(value="codigo") String codigo, @Param(value="nome") String nome);
 }

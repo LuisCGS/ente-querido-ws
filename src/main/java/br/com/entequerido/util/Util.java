@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
 
+import br.com.entequerido.model.Quadra;
+import br.com.entequerido.model.Rua;
+
 public final class Util {
 	public static final ResourceBundle bundleMensagens = ResourceBundle.getBundle("mensagens");
 	public static final ResourceBundle bundleConfig = ResourceBundle.getBundle("configuracoes");
@@ -208,4 +211,5 @@ public final class Util {
 	public static Boolean verificarOrdemParametrizado(String ordem) {
 		return !ordem.equalsIgnoreCase(Direction.ASC.toString()) && !ordem.equalsIgnoreCase(Direction.DESC.toString());
 	}
+	
 }

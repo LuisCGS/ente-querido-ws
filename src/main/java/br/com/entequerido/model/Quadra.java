@@ -3,12 +3,13 @@ package br.com.entequerido.model;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import br.com.entequerido.util.Util;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 public class Quadra extends Generico {
 	@NotBlank(message="Por favor, informe o nome da quadra")
 	private String nome;
 	
+	@DBRef
 	@NotNull(message="Por favor, informe os dados do cemiterio, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Cemiterio A'}")
 	private Cemiterio cemiterio;
 	
@@ -35,10 +36,5 @@ public class Quadra extends Generico {
 
 	public void setCemiterio(Cemiterio cemiterio) {
 		this.cemiterio = cemiterio;
-	}
-
-	@Override
-	public String toString() {
-		return Util.gson.toJson(this);
 	}
 }

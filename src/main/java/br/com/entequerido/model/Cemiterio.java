@@ -6,14 +6,19 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 
 public class Cemiterio extends Generico{
 	@NotBlank(message="Por favor, informe o nome da rua contendo pelo menos 3 caracteres!")
 	@Size(min=3, message="Por favor, informe um nome de rua com mais de 2 caracteres!")
 	private String nome;
 	
+	@DBRef
 	@NotNull(message="Por favor, informe os dados da cidade, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Cidade A'}")
 	private Cidade cidade;
+	
+	@DBRef
 	private List<Tumulo> listaTumulo;
 	
 	public Cemiterio() {

@@ -42,11 +42,12 @@ public class CidadeController {
 	@RequestMapping(value=Caminhos.SALVAR_CIDADE, method=RequestMethod.POST)
 	public String salvarCidade(@Valid @RequestBody Cidade cidade) throws Exception{
 		try {
-			Cidade cidadeConsulta = cidadeRepository.findByCodigoOrNome(null, cidade.getNome());
+			Cidade cidadeConsulta = cidadeRepository.findByCodigoOrNome(null, cidade.getNome().trim());
 			
 			if(Util.isNotNull(cidadeConsulta)
 					&& !cidade.equals(cidadeConsulta)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_F_EXISTENTE, Caminhos.WS_CIDADE.concat(Caminhos.SALVAR_CIDADE), Parametros.CIDADE);
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Caminhos.WS_CIDADE.concat(Caminhos.SALVAR_CIDADE), 
+						Parametros.CIDADE, Parametros.CIDADE_NOME);
 			}
 			
 			return cidadeRepository.save(cidade).toString();

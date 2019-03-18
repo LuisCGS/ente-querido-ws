@@ -17,7 +17,6 @@ import com.google.gson.Gson;
 
 import br.com.entequerido.model.Cemiterio;
 import br.com.entequerido.model.Cidade;
-import br.com.entequerido.model.Quadra;
 import br.com.entequerido.repository.CemiterioRepository;
 import br.com.entequerido.repository.CidadeRepository;
 import br.com.entequerido.util.Caminhos;
@@ -46,14 +45,19 @@ public class CemiterioController {
 	public String salvarCemiterio(@Valid @RequestBody Cemiterio cemiterio) throws Exception{
 		try {
 			
-			Cidade cidade = cidadeRepository.findById(cemiterio.getCidade().getCodigo()).get();
+			Cidade cidade = cidadeRepository.findByCodigoOrNome(cemiterio.getCidade().getCodigo(), null);
 			
 			if(Util.isNull(cidade)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_F_ATRIBUTO_CLASSE, Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO), Parametros.CIDADE_CODIGO, Parametros.CIDADE);
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, 
+						Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO), Parametros.CIDADE_CODIGO, Parametros.CIDADE);
 			}
 			
-			if(Util.isNotNull(cemiterioRepository.findByNomeIgnoreCaseAndCidadeCodigo(cemiterio.getNome(), cidade.getCodigo()))) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTENTE, Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO), Parametros.CEMITERIO);
+			Cemiterio cemiterioConsulta = cemiterioRepository.findByNomeIgnoreCaseAndCidadeCodigo(cemiterio.getNome(), cidade.getCodigo());
+			
+			if(Util.isNotNull(cemiterioConsulta)
+					&& !cemiterio.equals(cemiterioConsulta)) {
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_CLASSE_M_ATRIBUTO_EXISTENTE, 
+						Caminhos.WS_CEMITERIO.concat(Caminhos.SALVAR_CEMITERIO), Parametros.CEMITERIO, Parametros.CEMITERIO_NOME);
 			}
 			
 			cemiterio.setCidade(cidade);
