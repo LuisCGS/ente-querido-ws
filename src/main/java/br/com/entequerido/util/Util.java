@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
 
-import br.com.entequerido.model.Quadra;
-import br.com.entequerido.model.Rua;
-
-public final class Util {
+public class Util {
 	public static final ResourceBundle bundleMensagens = ResourceBundle.getBundle("mensagens");
 	public static final ResourceBundle bundleConfig = ResourceBundle.getBundle("configuracoes");
 	public static final Gson gson = new Gson();
