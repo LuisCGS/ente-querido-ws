@@ -13,7 +13,7 @@
 	<artifactId>ente-querido-api</artifactId>
 	<version>0.0.1</version>
 	<name>ente-querido</name>
-	<description>Projeto para controle de falecidos</description>
+	<description>Projeto para controle de falecidos.</description>
 
 	<properties>
 		<java.version>1.8</java.version>
