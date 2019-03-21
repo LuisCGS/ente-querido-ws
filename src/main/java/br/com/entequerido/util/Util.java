@@ -148,7 +148,7 @@ public class Util {
 	 * @param parametros : {@link String}[]
 	 * @return {@link String}
 	 */
-	private static String montarMensagemParametrizado(String codigoMensagem, String... parametros) {
+	public static String montarMensagemParametrizado(String codigoMensagem, String... parametros) {
 		String mensagem = bundleMensagens.getString(codigoMensagem);
 		
 		for (int i = 0; i < parametros.length; i++) {

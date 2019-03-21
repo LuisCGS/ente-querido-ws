@@ -1,4 +1,4 @@
-package br.com.entequerido.exceptions;
+package br.com.entequerido.exception;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ public class ApiError {
 	private HttpStatus status;
 	private String message;
 	private String debugMessage;
+	private String path;
 	private List<ApiSubError> subErrors;
 	
 	private ApiError() {
@@ -34,18 +35,20 @@ public class ApiError {
 		this.status = status;
 	}
 	
-	public ApiError(HttpStatus status, Throwable ex) {
+	public ApiError(HttpStatus status, Throwable ex, String path) {
 		this();
 		this.status = status;
-		this.message = "Unexpected error";
-		this.debugMessage = ex.getLocalizedMessage();
+		this.message = ex.getMessage();
+		this.path = path;
+		this.debugMessage = ex.getCause() == null ? null : ex.getCause().getLocalizedMessage();
 	}
 	
-	public ApiError(HttpStatus status, String message, Throwable ex) {
+	public ApiError(HttpStatus status, String message, Throwable ex, String path) {
 		this();
 		this.status = status;
 		this.message = message;
 		this.debugMessage = ex.getLocalizedMessage();
+		this.path = path;
 	}
 	
 	private void addSubError(ApiSubError subError) {
