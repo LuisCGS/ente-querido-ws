@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +23,8 @@ import br.com.entequerido.repository.TumuloRepository;
 import br.com.entequerido.util.Caminhos;
 import br.com.entequerido.util.Parametros;
 import br.com.entequerido.util.Util;
+import br.com.entequerido.exception.GenericoException;
+import br.com.entequerido.exception.ValidacaoException;
 import br.com.entequerido.model.Quadra;
 
 @RestController
@@ -45,28 +48,30 @@ public class RuaController {
 	 * @return {@link String}
 	 * @throws Exception
 	 */
-	@RequestMapping(value=Caminhos.SALVAR_RUA, method=RequestMethod.POST)
-	public String salvarRua(@Valid @RequestBody Rua rua) throws Exception{
+	@PostMapping
+	public String salvarRua(@Valid @RequestBody Rua rua) throws ValidacaoException, Exception{
 		try {
 			Quadra quadra = quadraRepository.findByNomeOrCodigo(null, rua.getQuadra().getCodigo());
 			
 			if(Util.isNull(quadra)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), 
-						Parametros.QUADRA_CODIGO, Parametros.QUADRA);
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, Caminhos.RUA.concat(Caminhos.SALVAR_RUA), 
+						Parametros.QUADRA_CODIGO, Parametros.QUADRA), Caminhos.RUA);
 			}
 			
 			Rua ruaConsulta = ruaRepository.findByNomeIgnoreCaseAndQuadraCodigo(rua.getNome().trim(), quadra.getCodigo());
 			
 			if(Util.isNotNull(ruaConsulta)
 					&& !rua.equals(ruaConsulta)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), 
-						Parametros.RUA, Parametros.RUA_NOME);
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Caminhos.RUA.concat(Caminhos.SALVAR_RUA), 
+						Parametros.RUA, Parametros.RUA_NOME), Caminhos.RUA);
 			}
 			
 			rua.setQuadra(quadra);
 			return ruaRepository.save(rua).toString();
+		} catch (ValidacaoException e) {
+			throw e;
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA));
+			throw new GenericoException(e.getMessage(), Caminhos.RUA);
 		}
 	}
 	
@@ -93,7 +98,7 @@ public class RuaController {
 			if(Util.isNotBlank(ordem)) {
 				if(Util.verificarOrdemParametrizado(ordem)) {
 					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, 
-							Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO));
+							Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO));
 				}
 				
 				ordemSort = Direction.fromString(ordem);
@@ -105,7 +110,7 @@ public class RuaController {
 				return new Gson().toJson(ruaRepository.findByNomeLikeIgnoreCase(nomeRua, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
 			}
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO));
 		}
 	}
 	
@@ -125,7 +130,7 @@ public class RuaController {
 			
 			if(Util.isNotBlank(ordem)) {
 				if(Util.verificarOrdemParametrizado(ordem)) {
-					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
+					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
 				}
 				
 				ordemSort = Direction.fromString(ordem);
@@ -134,7 +139,7 @@ public class RuaController {
 			Quadra quadra = quadraRepository.findByNomeOrCodigo(null, codigoQuadra);
 			
 			if(Util.isNull(quadra)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.WS_RUA.concat(Caminhos.SALVAR_RUA), 
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.RUA.concat(Caminhos.SALVAR_RUA), 
 						Parametros.QUADRA_CODIGO, Parametros.QUADRA);
 			}
 			
@@ -144,7 +149,7 @@ public class RuaController {
 				return new Gson().toJson(ruaRepository.findRuaByQuadraCodigo(codigoQuadra, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
 			}
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
 		}
 	}
 	
@@ -161,12 +166,12 @@ public class RuaController {
 		try {
 			if(Util.isNull(quadraRepository.findByNomeOrCodigo(codigoQuadra, null))){
 				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, 
-						Caminhos.WS_RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA), Parametros.QUADRA);
+						Caminhos.RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA), Parametros.QUADRA);
 			}
 			
 			return Long.toString(ruaRepository.countByQuadraCodigoOrNomeIgnoreCase(codigoQuadra, null));
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
 		}
 	}
 	
@@ -185,16 +190,16 @@ public class RuaController {
 			
 			if(Util.isNull(rua)) {
 				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, 
-						Caminhos.WS_RUA.concat(Caminhos.EXCLUIR_RUA), Parametros.RUA);
+						Caminhos.RUA.concat(Caminhos.EXCLUIR_RUA), Parametros.RUA);
 			}
 			
 			if(tumuloRepository.countByRuaCodigo(codigo) > 0) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Caminhos.WS_RUA.concat(Caminhos.EXCLUIR_RUA), Parametros.TUMULO);
+				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Caminhos.RUA.concat(Caminhos.EXCLUIR_RUA), Parametros.TUMULO);
 			}
 			
 			ruaRepository.delete(rua);
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_RUA.concat(Caminhos.EXCLUIR_RUA));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.EXCLUIR_RUA));
 		}
 			
 		return Util.montarRetornoSucesso(Parametros.MENSAGEM_SUCESSO_EXCLUIDA, Parametros.RUA);

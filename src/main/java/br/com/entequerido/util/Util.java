@@ -1,14 +1,10 @@
 package br.com.entequerido.util;
 
 import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
@@ -119,27 +115,6 @@ public class Util {
 		return new Double(numeroFormatado);
 	}
 	
-	/**
-	 * Metodos responsavel por montar a mensagem de retorno de um erro de validacao
-	 *
-	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
-	 * @Data: <i> 12/03/2019 - 03:01 </i>
-	 * @param mensagem : {@link String}
-	 * @param caminho : {@link String}
-	 * @return {@link String}
-	 */
-	public static String montarRetornoErro(String codigoMensagem, String caminho,  String ... parametros) {
-		Map<String, String> map = new HashMap<String, String>();
-		
-		map.put("timestamp", new Date().toString());
-		map.put("status", Integer.toString(HttpStatus.BAD_REQUEST.value()));
-		map.put("error", HttpStatus.BAD_REQUEST.name());
-		map.put("message", montarMensagemParametrizado(codigoMensagem, parametros));
-		map.put("path", caminho);
-		
-		return new Gson().toJson(map);
-	}
-
 	/** Metodos responsavel por montar mensagem sobreescrevendo os parametros
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
@@ -156,46 +131,6 @@ public class Util {
 		}
 		
 		return mensagem;
-	}
-	
-	/**
-	 * Metodos responsavel por montar a mensagem de retorno de uma excecao causada por algo interno 
-	 *
-	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
-	 * @Data: <i> 12/03/2019 - 03:32 </i>
-	 * @param mensagem : {@link String}
-	 * @param caminho : {@link String}
-	 * @return {@link String}
-	 */
-	public static String montarRetornoErroException(String mensagem, String caminho) {
-		Map<String, String> map = new HashMap<String, String>();
-		
-		map.put("timestamp", new Date().toString());
-		map.put("status", Integer.toString(HttpStatus.BAD_REQUEST.value()));
-		map.put("error", HttpStatus.BAD_REQUEST.name());
-		map.put("message", mensagem);
-		map.put("path", caminho);
-		
-		return new Gson().toJson(map);
-	}
-	
-	/**
-	 * Metodos responsavel por retornar uma mensagem de sucesso! 
-	 *
-	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
-	 * @Data: <i> 13/03/2019 - 01:24 </i>
-	 * @param codigoMensagem : {@link String} - codigo que esta no arquivo mensagens
-	 * @param entidade : {@link String} - entidade que foi executada
-	 * @return {@link String}
-	 */
-	public static String montarRetornoSucesso(String codigoMensagem, String ... parametros) {
-		Map<String, String> map = new HashMap<String, String>();
-		
-		map.put("timestamp", new Date().toString());
-		map.put("status", Integer.toString(HttpStatus.ACCEPTED.value()));
-		map.put("message", montarMensagemParametrizado(codigoMensagem, parametros));
-		
-		return new Gson().toJson(map);
 	}
 	
 	/** Metodos responsavel por verificar a ordem informada pelo {@link RequestParam}

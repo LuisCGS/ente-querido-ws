@@ -48,21 +48,21 @@ public class TumuloController {
 			
 			if(Util.isNull(cemiterio)) {
 				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, 
-						Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.CEMITERIO_CODIGO, Parametros.CEMITERIO);
+						Caminhos.TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.CEMITERIO_CODIGO, Parametros.CEMITERIO);
 			}
 			
 			Rua rua = ruaRepository.findByCodigoOrNome(tumulo.getRua().getCodigo(), null);
 			
 			if(Util.isNull(rua)) {
 				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_VALIDACAO_F_ATRIBUTO_CLASSE, 
-						Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.RUA_CODIGO, Parametros.RUA);
+						Caminhos.TUMULO.concat(Caminhos.SALVAR_TUMULO), Parametros.RUA_CODIGO, Parametros.RUA);
 			}
 			
 			tumulo.setCemiterio(cemiterio);
 			tumulo.setRua(rua);
 			return tumuloRepository.save(tumulo).toString();
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_TUMULO.concat(Caminhos.SALVAR_TUMULO));
+			return Util.montarRetornoErroException(e.getMessage(), Caminhos.TUMULO.concat(Caminhos.SALVAR_TUMULO));
 		}
 	}
 	

@@ -1,5 +1,7 @@
 package br.com.entequerido.controller;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
+import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
 import br.com.entequerido.model.Cidade;
 import br.com.entequerido.repository.CemiterioRepository;
@@ -28,7 +28,7 @@ import br.com.entequerido.util.Parametros;
 import br.com.entequerido.util.Util;
 
 @RestController
-@RequestMapping("/ws/cidade")
+@RequestMapping("/cidade")
 public class CidadeController {
 	@Autowired
 	private CidadeRepository cidadeRepository;
@@ -43,7 +43,7 @@ public class CidadeController {
 	 * @Data: <i> 14/03/2019 - 04:28 </i>
 	 * @param cidade : {@link Cidade}
 	 * @return {@link String}
-	 * @throws Exception
+	 * @throws ValidacaoException, Exception
 	 */
 	@PostMapping
 	public ResponseEntity<?> salvarCidade(@Valid @RequestBody Cidade cidade) throws ValidacaoException, Exception{
@@ -52,16 +52,14 @@ public class CidadeController {
 			
 			if(Util.isNotNull(cidadeConsulta)
 					&& !cidade.equals(cidadeConsulta)) {
-				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Parametros.CIDADE, Parametros.CIDADE_NOME), Caminhos.WS_CIDADE);
-//				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Caminhos.WS_CIDADE.concat(Caminhos.SALVAR_CIDADE), 
-//						Parametros.CIDADE, Parametros.CIDADE_NOME);
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Parametros.CIDADE, Parametros.CIDADE_NOME), Caminhos.CIDADE);
 			}
 			
 			return new ResponseEntity<>(cidadeRepository.save(cidade), HttpStatus.OK);
 		} catch (ValidacaoException e) {
 			throw e;
 		} catch (Exception e) {
-			throw e;
+			throw new GenericoException(e.getMessage(), Caminhos.CIDADE);
 		}
 	}
 	
@@ -76,16 +74,17 @@ public class CidadeController {
 	 * @param pagina : {@link Integer}
 	 * @param tamanho : {@link Integer}
 	 * @return {@link String}
+	 * @throws ValidacaoException, GenericoException 
 	 */
 	@GetMapping
 	public ResponseEntity<?> buscarCidadePorNomeOrdenadoEOuPaginado(@RequestParam String nomeCidade, @RequestParam String ordem, 
-			@RequestParam Integer pagina, @RequestParam Integer tamanho) {
+			@RequestParam Integer pagina, @RequestParam Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
 			Direction ordemSort = Direction.ASC;
 			
 			if(Util.isNotBlank(ordem)) {
 				if(Util.verificarOrdemParametrizado(ordem)) {
-//					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.WS_CIDADE.concat(Caminhos.BUSCAR_CIDADE_POR_NOME_ORDENADO_E_OU_PAGINADO));
+					throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA), Caminhos.CIDADE);
 				}
 				
 				ordemSort = Direction.fromString(ordem);
@@ -96,9 +95,10 @@ public class CidadeController {
 			} else {
 				return new ResponseEntity<>(cidadeRepository.findByNomeLikeIgnoreCase(nomeCidade, PageRequest.of(pagina, tamanho, ordemSort, Parametros.CIDADE_NOME)), HttpStatus.OK);
 			}
-		} catch (Exception e) {
+		} catch (ValidacaoException e) {
 			throw e;
-//			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CIDADE.concat(Caminhos.BUSCAR_CIDADE_POR_NOME_ORDENADO_E_OU_PAGINADO));
+		} catch (Exception e) {
+			throw new GenericoException(e.getMessage(), Caminhos.CIDADE);
 		}
 	}
 	
@@ -109,25 +109,26 @@ public class CidadeController {
 	 * @Data: <i> 16/03/2019 - 11:53 </i>
 	 * @param codigo : {@link String}
 	 * @return {@link String}
+	 * @throws ValidacaoException, GenericoException 
 	 */
 	@DeleteMapping
-	public String excluirCidade(@RequestParam String codigo) {
+	public void excluirCidade(@RequestParam String codigo) throws ValidacaoException, GenericoException {
 		try {
-			Cidade cidade = cidadeRepository.findById(codigo).get();
+			Optional<Cidade> cidade = cidadeRepository.findById(codigo);
 			
-			if(Util.isNull(cidade)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Caminhos.WS_CIDADE.concat(Caminhos.EXCLUIR_CIDADE), Parametros.CIDADE);
+			if(!cidade.isPresent()) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Parametros.CIDADE), Caminhos.CIDADE);
 			}
 			
 			if(cemiterioRepository.countByCidadeCodigoOrNome(codigo, null) > 0) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Caminhos.WS_CIDADE.concat(Caminhos.EXCLUIR_CIDADE), Parametros.CEMITERIO, Parametros.CIDADE);
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Parametros.CEMITERIO, Parametros.CIDADE), Caminhos.CIDADE);
 			}
 			
-			cidadeRepository.delete(cidade);
+			cidadeRepository.delete(cidade.get());
+		} catch (ValidacaoException e) {
+			throw e;
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.WS_CIDADE.concat(Caminhos.EXCLUIR_CIDADE));
+			throw new GenericoException(e.getMessage(), Caminhos.CIDADE);
 		}
-			
-		return Util.montarRetornoSucesso(Parametros.MENSAGEM_SUCESSO_EXCLUIDA, Parametros.CIDADE);
 	}
 }

@@ -5,8 +5,8 @@ public class ValidacaoException extends RuntimeException {
 	
 	private String path;
 	
-	public ValidacaoException(String exception) {
-		super(exception);
+	public ValidacaoException(String message) {
+		super(message);
 	}
 	
 	public ValidacaoException(String message, String path) {
