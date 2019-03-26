@@ -11,12 +11,12 @@ public class ValidacaoException extends RuntimeException {
 	
 	public ValidacaoException(String message, String path) {
 		super(message);
-		this.setPath(path);
+		this.path = path;
 	}
 	
 	public ValidacaoException(String message, Throwable causa, String path) {
 		super(message, causa);
-		this.setPath(path);
+		this.path = path;
 	}
 
 	public String getPath() {

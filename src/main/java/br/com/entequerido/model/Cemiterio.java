@@ -18,18 +18,17 @@ public class Cemiterio extends Generico{
 	@NotNull(message="Por favor, informe os dados da cidade, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Cidade A'}")
 	private Cidade cidade;
 	
-	@DBRef
-	private List<Tumulo> listaTumulo;
+	private List<Quadra> listaQuadra;
 	
 	public Cemiterio() {
 		super();
 	}
 	
-	public Cemiterio(String codigo, Cidade cidade, String nome, List<Tumulo> listaTumulo) {
+	public Cemiterio(String codigo, Cidade cidade, String nome, List<Quadra> listaQuadra) {
 		super(codigo);
 		this.nome = nome;
 		this.cidade = cidade;
-		this.listaTumulo = listaTumulo;
+		this.listaQuadra = listaQuadra;
 	}
 
 	public String getNome() {
@@ -48,11 +47,11 @@ public class Cemiterio extends Generico{
 		this.cidade = cidade;
 	}
 
-	public List<Tumulo> getListaTumulo() {
-		return listaTumulo;
+	public List<Quadra> getListaQuadra() {
+		return listaQuadra;
 	}
 
-	public void setListaTumulo(List<Tumulo> listaTumulo) {
-		this.listaTumulo = listaTumulo;
+	public void setListaQuadra(List<Quadra> listaQuadra) {
+		this.listaQuadra = listaQuadra;
 	}
 }

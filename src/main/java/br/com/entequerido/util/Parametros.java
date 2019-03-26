@@ -16,6 +16,7 @@ public final class Parametros {
 	public static final String QUADRA_NOME = "nome";
 	public static final String QUADRA_CODIGO = "codigo";
 	
+	public static final String TUMULO_NOME = "nome";
 	public static final String TUMULO_CODIGO = "codigo";
 	
 	public static final String PESSOA_NOME = "nome";

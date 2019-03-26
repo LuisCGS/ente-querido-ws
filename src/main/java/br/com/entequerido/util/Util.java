@@ -5,6 +5,8 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
@@ -144,4 +146,19 @@ public class Util {
 		return !ordem.equalsIgnoreCase(Direction.ASC.toString()) && !ordem.equalsIgnoreCase(Direction.DESC.toString());
 	}
 	
+	/**
+	 * Metodos responsavel por montar o retorno do response entity com o status de OK do {@link HttpStatus}, para haver reaproveitamento de codigo
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 22/03/2019 - 10:31 </i>
+	 * @param objeto : {@link Object}
+	 * @return {@link ResponseEntity}
+	 */
+	public static ResponseEntity<?> montarRetornoResponseEntity(Object objeto) {
+		if(isNull(objeto)) {
+			return null;
+		}
+		
+		return new ResponseEntity<>(objeto, HttpStatus.OK);
+	}
 }

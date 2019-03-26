@@ -8,9 +8,9 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import br.com.entequerido.enumeration.CorEnum;
-import br.com.entequerido.enumeration.EstadoCivilEnum;
-import br.com.entequerido.enumeration.SexoEnum;
+import br.com.entequerido.model.enumeration.CorEnum;
+import br.com.entequerido.model.enumeration.EstadoCivilEnum;
+import br.com.entequerido.model.enumeration.SexoEnum;
 
 public class Pessoa extends Generico{
 	@NotNull(message="Por favor, informe a matrícula")
@@ -44,7 +44,7 @@ public class Pessoa extends Generico{
 	private String documentoIdentificacao;
 	
 	@NotNull(message="Por favor, informe o campo eleitor")
-	private String eleitor;
+	private Boolean eleitor;
 	
 	@NotNull(message="Por favor, informe a filiação, profissão e residência")
 	private String filiacaoProfissaoResidencia;
@@ -59,6 +59,7 @@ public class Pessoa extends Generico{
 	private String sepultamento;
 	
 	@NotNull(message="Por favor, informe o tumulo em que a pessoa se encontra")
+	@DBRef
 	private Tumulo tumulo;
 	
 	private String cartorioCasamento;
@@ -69,12 +70,13 @@ public class Pessoa extends Generico{
 	@DBRef
 	private List<Filho> listaFilho;
 	
-	public Pessoa(String codigo) {
-		super(codigo);
+	public Pessoa() {
+		super();
 	}
+	
 	public Pessoa(String codigo, String matricula, String nome, Date dataNascimento, Date dataFalecimento,
 			SexoEnum sexoEnum,  CorEnum corEnum, EstadoCivilEnum estadoCivilEnum, String profissao, String residencia, 
-			String documentoIdentificacao, String eleitor, String filiacaoProfissaoResidencia, String localFalecimento, String causaMorte, 
+			String documentoIdentificacao, Boolean eleitor, String filiacaoProfissaoResidencia, String localFalecimento, String causaMorte, 
 			String sepultamento, Tumulo tumulo, String cartorioCasamento, String nomeConjuge, String declarante, String observacoes, List<Filho> listaFilho) {
 		super(codigo);
 		this.matricula = matricula;
@@ -99,6 +101,7 @@ public class Pessoa extends Generico{
 		this.observacoes = observacoes;
 		this.listaFilho = listaFilho;
 	}
+	
 	
 	public String getMatricula() {
 		return matricula;
@@ -160,10 +163,10 @@ public class Pessoa extends Generico{
 	public void setDocumentoIdentificacao(String documentoIdentificacao) {
 		this.documentoIdentificacao = documentoIdentificacao;
 	}
-	public String getEleitor() {
+	public Boolean getEleitor() {
 		return eleitor;
 	}
-	public void setEleitor(String eleitor) {
+	public void setEleitor(Boolean eleitor) {
 		this.eleitor = eleitor;
 	}
 	public String getFiliacaoProfissaoResidencia() {

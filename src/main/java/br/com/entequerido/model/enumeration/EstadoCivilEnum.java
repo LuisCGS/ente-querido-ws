@@ -1,4 +1,4 @@
-package br.com.entequerido.enumeration;
+package br.com.entequerido.model.enumeration;
 
 public enum EstadoCivilEnum {
 	CASADO		("Casado"),

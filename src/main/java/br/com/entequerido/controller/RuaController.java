@@ -1,5 +1,7 @@
 package br.com.entequerido.controller;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
@@ -7,14 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.google.gson.Gson;
 
 import br.com.entequerido.model.Rua;
 import br.com.entequerido.repository.QuadraRepository;
@@ -28,7 +31,7 @@ import br.com.entequerido.exception.ValidacaoException;
 import br.com.entequerido.model.Quadra;
 
 @RestController
-@RequestMapping("/ws/rua")
+@RequestMapping("/rua")
 public class RuaController {
 	@Autowired
 	private RuaRepository ruaRepository;
@@ -49,25 +52,25 @@ public class RuaController {
 	 * @throws Exception
 	 */
 	@PostMapping
-	public String salvarRua(@Valid @RequestBody Rua rua) throws ValidacaoException, Exception{
+	public ResponseEntity<?> salvar(@Valid @RequestBody Rua rua) throws ValidacaoException, Exception{
 		try {
-			Quadra quadra = quadraRepository.findByNomeOrCodigo(null, rua.getQuadra().getCodigo());
+			Quadra quadra = quadraRepository.findByCodigoOrNome(rua.getQuadra().getCodigo(), null);
 			
 			if(Util.isNull(quadra)) {
-				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, Caminhos.RUA.concat(Caminhos.SALVAR_RUA), 
-						Parametros.QUADRA_CODIGO, Parametros.QUADRA), Caminhos.RUA);
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE, Parametros.QUADRA_CODIGO, 
+						Parametros.QUADRA), Caminhos.RUA);
 			}
 			
 			Rua ruaConsulta = ruaRepository.findByNomeIgnoreCaseAndQuadraCodigo(rua.getNome().trim(), quadra.getCodigo());
 			
 			if(Util.isNotNull(ruaConsulta)
 					&& !rua.equals(ruaConsulta)) {
-				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Caminhos.RUA.concat(Caminhos.SALVAR_RUA), 
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, 
 						Parametros.RUA, Parametros.RUA_NOME), Caminhos.RUA);
 			}
 			
 			rua.setQuadra(quadra);
-			return ruaRepository.save(rua).toString();
+			return Util.montarRetornoResponseEntity(ruaRepository.save(rua));
 		} catch (ValidacaoException e) {
 			throw e;
 		} catch (Exception e) {
@@ -88,68 +91,31 @@ public class RuaController {
 	 * @param pagina : {@link Integer}
 	 * @param tamanho : {@link Integer}
 	 * @return {@link String}
+	 * @throws GenericoException, ValidacaoException 
 	 */
-	@RequestMapping(value=Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO, method=RequestMethod.GET)
-	public String buscarRuaPorNomeOrdenadoEOuPaginado(@RequestParam String nomeRua, @RequestParam String ordem, 
-			@RequestParam Integer pagina, @RequestParam Integer tamanho) {
+	@GetMapping
+	public ResponseEntity<?> buscarRuaPorNomeOrdenadoEOuPaginado(@RequestParam String nome, @RequestParam String ordem, 
+			@RequestParam Integer pagina, @RequestParam Integer tamanho) throws GenericoException, ValidacaoException {
 		try {
 			Direction ordemSort = Direction.ASC;
 			
 			if(Util.isNotBlank(ordem)) {
 				if(Util.verificarOrdemParametrizado(ordem)) {
-					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, 
-							Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO));
+					throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA), Caminhos.RUA);
 				}
 				
 				ordemSort = Direction.fromString(ordem);
 			} 
 			
 			if(Util.isNull(pagina) || Util.isNull(tamanho)) {
-				return new Gson().toJson(ruaRepository.findByNomeLikeIgnoreCase(nomeRua, new Sort(ordemSort, Parametros.RUA_NOME)));
+				return Util.montarRetornoResponseEntity(ruaRepository.findByNomeLikeIgnoreCase(nome, new Sort(ordemSort, Parametros.RUA_NOME)));
 			} else {
-				return new Gson().toJson(ruaRepository.findByNomeLikeIgnoreCase(nomeRua, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
+				return Util.montarRetornoResponseEntity(ruaRepository.findByNomeLikeIgnoreCase(nome, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
 			}
+		} catch (ValidacaoException e) {
+			throw e;
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_NOME_ORDENADO_E_OU_PAGINADO));
-		}
-	}
-	
-	/**
-	 * Metodos responsavel por buscar uma lista de {@link Rua} informando um nome de {@link Quadra}  
-	 *
-	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
-	 * @Data: <i> 12/03/2019 - 04:04 </i>
-	 * @param codigoQuadra : {@link String}
-	 * @return {@link String}
-	 */
-	@RequestMapping(value=Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA, method=RequestMethod.GET)
-	public String buscarRuaPorQuadra(@RequestParam String codigoQuadra, @RequestParam String ordem, 
-			@RequestParam Integer pagina, @RequestParam Integer tamanho) {
-		try {
-			Direction ordemSort = Direction.ASC;
-			
-			if(Util.isNotBlank(ordem)) {
-				if(Util.verificarOrdemParametrizado(ordem)) {
-					return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_ORDEM_INCORRETA, Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
-				}
-				
-				ordemSort = Direction.fromString(ordem);
-			}
-			
-			Quadra quadra = quadraRepository.findByNomeOrCodigo(null, codigoQuadra);
-			
-			if(Util.isNull(quadra)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.RUA.concat(Caminhos.SALVAR_RUA), 
-						Parametros.QUADRA_CODIGO, Parametros.QUADRA);
-			}
-			
-			if(Util.isNull(pagina) || Util.isNull(tamanho)) {
-				return new Gson().toJson(ruaRepository.findRuaByQuadraCodigo(codigoQuadra, new Sort(ordemSort, Parametros.RUA_NOME)));
-			} else {
-				return new Gson().toJson(ruaRepository.findRuaByQuadraCodigo(codigoQuadra, PageRequest.of(pagina, tamanho, ordemSort, Parametros.RUA_NOME)));
-			}
-		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
+			throw new GenericoException(e.getMessage(), Caminhos.RUA);
 		}
 	}
 	
@@ -160,18 +126,21 @@ public class RuaController {
 	 * @Data: <i> 13/03/2019 - 12:35 </i>
 	 * @param codigoQuadra : {@link String}
 	 * @return {@link String}
+	 * @throws ValidacaoException, GenericoException 
 	 */
 	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA, method=RequestMethod.GET)
-	public String buscarQuantidadeRuaPorQuadra(@RequestParam @NotBlank String codigoQuadra) {
+	public String buscarQuantidadeRuaPorQuadra(@RequestParam @NotBlank String codigoQuadra) throws ValidacaoException, GenericoException {
 		try {
-			if(Util.isNull(quadraRepository.findByNomeOrCodigo(codigoQuadra, null))){
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, 
-						Caminhos.RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA), Parametros.QUADRA);
+			if(Util.isNull(quadraRepository.findByCodigoOrNome(codigoQuadra, null))){
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Parametros.QUADRA), 
+						Caminhos.RUA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA));
 			}
 			
-			return Long.toString(ruaRepository.countByQuadraCodigoOrNomeIgnoreCase(codigoQuadra, null));
+			return Long.toString(ruaRepository.countByQuadraCodigoOrNome(codigoQuadra, null));
+		} catch (ValidacaoException e) {
+			throw e;
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.BUSCAR_RUA_POR_CODIGO_QUADRA));
+			throw new GenericoException(e.getMessage(), Caminhos.QUADRA.concat(Caminhos.BUSCAR_QUANTIDADE_RUA_POR_CODIGO_DE_QUADRA));
 		}
 	}
 	
@@ -180,29 +149,28 @@ public class RuaController {
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 13/03/2019 - 01:27 </i>
-	 * @param rua : {@link String}
-	 * @return {@link String}
+	 * @param codigo : {@link String}
+	 * @throws GenericoException 
 	 */
-	@RequestMapping(value=Caminhos.EXCLUIR_RUA, method=RequestMethod.DELETE)
-	public String excluirRua(@RequestParam String codigo) {
+	@DeleteMapping
+	public void excluir(String codigo) throws ValidacaoException, GenericoException {
 		try {
-			Rua rua = ruaRepository.findById(codigo).get();
+			Optional<Rua> rua = ruaRepository.findById(codigo);
 			
-			if(Util.isNull(rua)) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, 
-						Caminhos.RUA.concat(Caminhos.EXCLUIR_RUA), Parametros.RUA);
+			if(!rua.isPresent()) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Parametros.RUA), Caminhos.RUA);
 			}
 			
-			if(tumuloRepository.countByRuaCodigo(codigo) > 0) {
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Caminhos.RUA.concat(Caminhos.EXCLUIR_RUA), Parametros.TUMULO);
+			if(tumuloRepository.countByRuaCodigo(rua.get().getCodigo()) > 0) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Parametros.TUMULO, Parametros.RUA), Caminhos.RUA);
 			}
 			
-			ruaRepository.delete(rua);
+			ruaRepository.delete(rua.get());
+		} catch (ValidacaoException e) {
+			throw e;
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.RUA.concat(Caminhos.EXCLUIR_RUA));
+			throw new GenericoException(e.getMessage(), Caminhos.RUA);
 		}
-			
-		return Util.montarRetornoSucesso(Parametros.MENSAGEM_SUCESSO_EXCLUIDA, Parametros.RUA);
 	}
 	
 }

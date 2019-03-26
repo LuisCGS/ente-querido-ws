@@ -3,30 +3,42 @@ package br.com.entequerido.model;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import br.com.entequerido.model.enumeration.SepultamentoEnum;
+
 public class Tumulo extends Generico {
+
+	@Size(min=3, message="Por favor, informe um nome para o tumulo com mais de 2 caracteres, utilizar o nome da família! ")
+	private String nome;
 	
+	@DBRef
 	@NotNull(message="Por favor, informe os dados da rua, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Rua A'}")
 	private Rua rua;
 	
-	@DBRef
-	@NotNull(message="Por favor, informe os dados do cemiterio, ou cadastre um. Ex.: {'codigo' : '123', 'nome' : 'Cemiterio A'}")
-	private Cemiterio cemiterio;
+	private List<SepultamentoEnum> listaSepultamento;
 	
-	@DBRef
 	private List<Pessoa> listaPessoa;
 	
 	public Tumulo() {
 		super();
 	}
 	
-	public Tumulo(String codigo, Rua rua, Cemiterio cemiterio, List<Pessoa> listaPessoa) {
+	public Tumulo(String codigo, String nome, Rua rua, List<Pessoa> listaPessoa) {
 		super(codigo);
+		this.nome = nome;
 		this.rua = rua;
-		this.cemiterio = cemiterio;
 		this.listaPessoa = listaPessoa;
+	}
+	
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+	public String getNome() {
+		return this.nome;
 	}
 
 	public Rua getRua() {
@@ -35,14 +47,6 @@ public class Tumulo extends Generico {
 
 	public void setRua(Rua rua) {
 		this.rua = rua;
-	}
-
-	public Cemiterio getCemiterio() {
-		return cemiterio;
-	}
-
-	public void setCemiterio(Cemiterio cemiterio) {
-		this.cemiterio = cemiterio;
 	}
 
 	public List<Pessoa> getListaPessoa() {

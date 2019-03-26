@@ -13,6 +13,7 @@ import br.com.entequerido.util.Parametros;
 
 public interface CidadeRepository extends MongoRepository<Cidade, String> {
 	Cidade findByCodigoOrNome(@Param(value=Parametros.CIDADE_CODIGO) String codigo, @Param(value=Parametros.CIDADE_NOME) String nome);
+	Cidade findByNomeIgnoreCase(@Param(value=Parametros.CIDADE_NOME) String nome);
 	
 	List<Cidade> findByNomeLikeIgnoreCase(@Param(value=Parametros.CIDADE_NOME) String nome, Sort sort);
 	Page<Cidade> findByNomeLikeIgnoreCase(@Param(value=Parametros.CIDADE_NOME) String nome, Pageable pageable);

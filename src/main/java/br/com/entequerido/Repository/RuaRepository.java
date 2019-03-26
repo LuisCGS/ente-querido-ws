@@ -20,5 +20,5 @@ public interface RuaRepository extends MongoRepository<Rua, String>{
 	List<Rua> findByNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Sort sort);
 	Page<Rua> findByNomeLikeIgnoreCase(@Param(value=Parametros.RUA_NOME) String nome, Pageable pageable);
 	
-	long countByQuadraCodigoOrNomeIgnoreCase(@Param(value=Parametros.QUADRA_CODIGO) String codigoQuadra, @Param(value=Parametros.QUADRA_NOME) String nomeQuadra);
+	long countByQuadraCodigoOrNome(@Param(value=Parametros.QUADRA_CODIGO) String codigoQuadra, @Param(value=Parametros.QUADRA_NOME) String nomeQuadra);
 }

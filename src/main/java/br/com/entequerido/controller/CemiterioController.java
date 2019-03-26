@@ -1,5 +1,7 @@
 package br.com.entequerido.controller;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
@@ -7,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,26 +17,29 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
+import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Cemiterio;
 import br.com.entequerido.model.Cidade;
 import br.com.entequerido.repository.CemiterioRepository;
 import br.com.entequerido.repository.CidadeRepository;
+import br.com.entequerido.repository.QuadraRepository;
 import br.com.entequerido.util.Caminhos;
 import br.com.entequerido.util.Parametros;
 import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/cemiterio")
-public class CemiterioController {
+public class CemiterioController implements ControllerInterface{
 	@Autowired
 	private CemiterioRepository cemiterioRepository;
 	
 	@Autowired
 	private CidadeRepository cidadeRepository;
+	
+	@Autowired
+	private QuadraRepository quadraRepository;
 	
 	/**
 	 * Metodos responsavel por salvar um {@link Cemiterio} e retornar a entidade com o codigo gerado 
@@ -44,13 +47,12 @@ public class CemiterioController {
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 14/03/2019 - 10:37 </i>
 	 * @param cemiterio : {@link Cemiterio}
-	 * @return {@link String}
+	 * @return {@link ResponseEntity}
 	 * @throws Exception
 	 */
 	@PostMapping
-	public String salvarCemiterio(@Valid @RequestBody Cemiterio cemiterio) throws ValidacaoException, GenericoException {
+	public ResponseEntity<?> salvar(@Valid @RequestBody Cemiterio cemiterio) throws ValidacaoException, GenericoException {
 		try {
-			
 			Cidade cidade = cidadeRepository.findByCodigoOrNome(cemiterio.getCidade().getCodigo(), null);
 			
 			if(Util.isNull(cidade)) {
@@ -66,8 +68,7 @@ public class CemiterioController {
 						Parametros.CEMITERIO_NOME), Caminhos.CEMITERIO);
 			}
 			
-			cemiterio.setCidade(cidade);
-			return cemiterioRepository.save(cemiterio).toString();
+			return Util.montarRetornoResponseEntity(cemiterioRepository.save(cemiterio));
 		} catch (ValidacaoException e) {
 			throw e;
 		} catch (Exception e) {
@@ -76,20 +77,21 @@ public class CemiterioController {
 	}
 	
 	/**
-	 * Metodos responsavel por buscar um {@link Cemiterio} por nome podendo ser ordenado e/ou paginado 
+	 * Metodos responsavel por buscar uma lista ou paginas de {@link Cemiterio} por nome podendo ser ordenado e/ou paginado 
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 14/03/2019 - 10:40 </i>
-	 * @param nomeCemiterio : {@link String}
+	 * @param nome : {@link String}
 	 * @param ordem : {@link String}
 	 * @param pagina : {@link Integer}
 	 * @param tamanho : {@link Integer}
-	 * @return {@link String}
+	 * @return {@link ResponseEntity}
 	 * @throws GenericoException 
+	 * @throws ValidacaoException
 	 */
-	@GetMapping
-	public ResponseEntity<?> buscarCemiterioPorNomeOrdenadoEOuPaginado(@RequestParam String nomeCemiterio, @RequestParam String ordem, 
-			@RequestParam Integer pagina, @RequestParam Integer tamanho) throws ValidacaoException, GenericoException {
+	@Override
+	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, 
+			 Integer pagina, Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
 			Direction ordemSort = Direction.ASC;
 			
@@ -102,9 +104,9 @@ public class CemiterioController {
 			} 
 			
 			if(Util.isNull(pagina) || Util.isNull(tamanho)) {
-				return new ResponseEntity<>(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, new Sort(ordemSort, Parametros.CEMITERIO_NOME)), HttpStatus.OK);
+				return Util.montarRetornoResponseEntity(cemiterioRepository.findByNomeLikeIgnoreCase(nome, new Sort(ordemSort, Parametros.CEMITERIO_NOME)));
 			} else {
-				return new ResponseEntity<>(cemiterioRepository.findByNomeLikeIgnoreCase(nomeCemiterio, PageRequest.of(pagina, tamanho, ordemSort, Parametros.CEMITERIO_NOME)), HttpStatus.OK);
+				return Util.montarRetornoResponseEntity(cemiterioRepository.findByNomeLikeIgnoreCase(nome, PageRequest.of(pagina, tamanho, ordemSort, Parametros.CEMITERIO_NOME)));
 			}
 		} catch (ValidacaoException e) {
 			throw e;
@@ -118,22 +120,76 @@ public class CemiterioController {
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 16/03/2019 - 12:39 </i>
-	 * @param codigoCidade : {@link String}
-	 * @return {@link String}
+	 * @param codigo : {@link String}
+	 * @return {@link ResponseEntity}
 	 */
 	@RequestMapping(value=Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE, method=RequestMethod.GET)
-	public String buscarQuantidadeCemiterioPorCodigoCidade(@RequestParam @NotBlank String codigoCidade) throws ValidacaoException, GenericoException{
+	public ResponseEntity<?> buscarQuantidadeCemiterioPorCodigoCidade(@RequestParam @NotBlank String codigo) throws ValidacaoException, GenericoException{
 		try {
-			if(Util.isNull(cidadeRepository.findByCodigoOrNome(codigoCidade, null))) {
-				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE), Caminhos.CEMITERIO);
-				return Util.montarRetornoErro(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Caminhos.CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE), Parametros.CIDADE_CODIGO, Parametros.CIDADE);
+			if(Util.isNull(cidadeRepository.findByCodigoOrNome(codigo, null))) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Parametros.CIDADE_CODIGO, Parametros.CIDADE), Caminhos.CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE));
 			}
 			
-			return Long.toString(cemiterioRepository.countByCidadeCodigoOrNome(codigoCidade, null));
+			return Util.montarRetornoResponseEntity(cemiterioRepository.countByCidadeCodigoOrNome(codigo, null));
+		} catch (ValidacaoException e) {
+			throw e;
 		} catch (Exception e) {
-			return Util.montarRetornoErroException(e.getMessage(), Caminhos.CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE));
+			throw new GenericoException(e.getMessage(), Caminhos.CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE));
 		}
 	}
 	
+	/**
+	 * Metodos responsavel por buscar uma lista de {@link Cemiterio} de acordo com o codigo da {@link Cidade} 
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 22/03/2019 - 03:55 </i>
+	 * @param codigo : {@link String}
+	 * @return {@link ResponseEntity}
+	 * @throws ValidacaoException
+	 * @throws GenericoException
+	 */
+	@RequestMapping(value=Caminhos.BUSCAR_CEMITERIO_POR_CODIGO_DE_CIDADE, method=RequestMethod.GET)
+	public ResponseEntity<?> buscarCemiterioPorCodigoCidade(@RequestParam @NotBlank String codigo) throws ValidacaoException, GenericoException{
+		try {
+			if(Util.isNull(cidadeRepository.findByCodigoOrNome(codigo, null))) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_M_ATRIBUTO_F_CLASSE, Parametros.CIDADE_CODIGO, Parametros.CIDADE), Caminhos.CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE));
+			}
+			
+			return Util.montarRetornoResponseEntity(cemiterioRepository.findByCidadeCodigo(codigo));
+		} catch (ValidacaoException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new GenericoException(e.getMessage(), Caminhos.CEMITERIO.concat(Caminhos.BUSCAR_QUANTIDADE_CEMITERIO_POR_CODIGO_DE_CIDADE));
+		}
+	}
 	
+	/**
+	 * Metodos responsavel por deletar um {@link Cemiterio} a partir do codigo parametrizado
+	 *
+	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
+	 * @Data: <i> 22/03/2019 - 02:45 </i>
+	 * @param codigo : {@link String}
+	 * @throws ValidacaoException
+	 * @throws GenericoException
+	 */
+	@Override
+	public void excluir(String codigo) throws ValidacaoException, GenericoException {
+		try {
+			Optional<Cemiterio> cemiterio = cemiterioRepository.findById(codigo);
+			
+			if(!cemiterio.isPresent()) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_OBRIGATORIO_F_INEXISTENTE, Parametros.CEMITERIO), Caminhos.CEMITERIO);
+			}
+			
+			if(quadraRepository.countByCemiterioCodigo(codigo) > 0) {
+				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_M_EXISTE_VINCULO, Parametros.QUADRA, Parametros.CEMITERIO), Caminhos.CEMITERIO);
+			}
+			
+			cemiterioRepository.delete(cemiterio.get());
+		} catch (ValidacaoException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new GenericoException(e.getMessage(), Caminhos.CIDADE);
+		}
+	}
 }

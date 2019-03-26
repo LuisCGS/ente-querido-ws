@@ -8,18 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
+import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Cidade;
 import br.com.entequerido.repository.CemiterioRepository;
 import br.com.entequerido.repository.CidadeRepository;
@@ -29,7 +26,7 @@ import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/cidade")
-public class CidadeController {
+public class CidadeController implements ControllerInterface {
 	@Autowired
 	private CidadeRepository cidadeRepository;
 	
@@ -42,20 +39,20 @@ public class CidadeController {
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 14/03/2019 - 04:28 </i>
 	 * @param cidade : {@link Cidade}
-	 * @return {@link String}
+	 * @return {@link ResponseEntity}
 	 * @throws ValidacaoException, Exception
 	 */
 	@PostMapping
-	public ResponseEntity<?> salvarCidade(@Valid @RequestBody Cidade cidade) throws ValidacaoException, Exception{
+	public ResponseEntity<?> salvar(@Valid @RequestBody Cidade cidade) throws ValidacaoException, Exception{
 		try {
-			Cidade cidadeConsulta = cidadeRepository.findByCodigoOrNome(null, cidade.getNome().trim());
+			Cidade cidadeConsulta = cidadeRepository.findByNomeIgnoreCase(cidade.getNome().trim());
 			
 			if(Util.isNotNull(cidadeConsulta)
 					&& !cidade.equals(cidadeConsulta)) {
 				throw new ValidacaoException(Util.montarMensagemParametrizado(Parametros.MENSAGEM_ERRO_F_CLASSE_M_ATRIBUTO_EXISTENTE, Parametros.CIDADE, Parametros.CIDADE_NOME), Caminhos.CIDADE);
 			}
 			
-			return new ResponseEntity<>(cidadeRepository.save(cidade), HttpStatus.OK);
+			return Util.montarRetornoResponseEntity(cidadeRepository.save(cidade));
 		} catch (ValidacaoException e) {
 			throw e;
 		} catch (Exception e) {
@@ -64,21 +61,21 @@ public class CidadeController {
 	}
 	
 	/**
-	 * Metodos responsavel por buscar as {@link Cidade} podendo ser ordenado e/ou pagina conforme a parametrizacao passada
-	 * @param <T>
+	 * Metodos responsavel por buscar uma lista ou paginas de {@link Cidade} podendo ser ordenado e/ou pagina conforme a parametrizacao passada
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 14/03/2019 - 04:28 </i>
-	 * @param nomeCidade : {@link String}
+	 * @param nome : {@link String}
 	 * @param ordem : {@link String}
 	 * @param pagina : {@link Integer}
 	 * @param tamanho : {@link Integer}
-	 * @return {@link String}
-	 * @throws ValidacaoException, GenericoException 
+	 * @return {@link ResponseEntity}
+	 * @throws ValidacaoException
+	 * @throws GenericoException 
 	 */
-	@GetMapping
-	public ResponseEntity<?> buscarCidadePorNomeOrdenadoEOuPaginado(@RequestParam String nomeCidade, @RequestParam String ordem, 
-			@RequestParam Integer pagina, @RequestParam Integer tamanho) throws ValidacaoException, GenericoException {
+	@Override
+	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, 
+			Integer pagina, Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
 			Direction ordemSort = Direction.ASC;
 			
@@ -91,9 +88,9 @@ public class CidadeController {
 			} 
 			
 			if(Util.isNull(pagina) || Util.isNull(tamanho)) {
-				return new ResponseEntity<>(cidadeRepository.findByNomeLikeIgnoreCase(nomeCidade, new Sort(ordemSort, Parametros.CIDADE_NOME)), HttpStatus.OK) ;
+				return Util.montarRetornoResponseEntity(cidadeRepository.findByNomeLikeIgnoreCase(nome, new Sort(ordemSort, Parametros.CIDADE_NOME))) ;
 			} else {
-				return new ResponseEntity<>(cidadeRepository.findByNomeLikeIgnoreCase(nomeCidade, PageRequest.of(pagina, tamanho, ordemSort, Parametros.CIDADE_NOME)), HttpStatus.OK);
+				return Util.montarRetornoResponseEntity(cidadeRepository.findByNomeLikeIgnoreCase(nome, PageRequest.of(pagina, tamanho, ordemSort, Parametros.CIDADE_NOME)));
 			}
 		} catch (ValidacaoException e) {
 			throw e;
@@ -108,11 +105,10 @@ public class CidadeController {
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>
 	 * @Data: <i> 16/03/2019 - 11:53 </i>
 	 * @param codigo : {@link String}
-	 * @return {@link String}
 	 * @throws ValidacaoException, GenericoException 
 	 */
-	@DeleteMapping
-	public void excluirCidade(@RequestParam String codigo) throws ValidacaoException, GenericoException {
+	@Override
+	public void excluir(String codigo) throws ValidacaoException, GenericoException {
 		try {
 			Optional<Cidade> cidade = cidadeRepository.findById(codigo);
 			
