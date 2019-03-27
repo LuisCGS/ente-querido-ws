@@ -102,7 +102,6 @@ public class Pessoa extends Generico{
 		this.listaFilho = listaFilho;
 	}
 	
-	
 	public String getMatricula() {
 		return matricula;
 	}
