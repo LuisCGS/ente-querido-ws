@@ -12,13 +12,13 @@ tmp/
 *.swp
 *~.nib
 local.properties
-application.properties
 .settings/
 .loadpath
 .recommenders
 .mvn
 mvnw
 target/
+src/main/resources/application.properties
 mvnw.cmd
 
 # External tool builders
