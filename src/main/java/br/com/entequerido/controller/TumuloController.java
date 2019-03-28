@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
-import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Rua;
 import br.com.entequerido.model.Tumulo;
 import br.com.entequerido.repository.PessoaRepository;
@@ -28,7 +28,7 @@ import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/tumulo")
-public class TumuloController implements ControllerInterface {
+public class TumuloController {
 	@Autowired
 	private RuaRepository ruaRepository;
 	
@@ -112,6 +112,7 @@ public class TumuloController implements ControllerInterface {
 	 * @throws ValidacaoException
 	 * @throws GenericoException
 	 */
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR','USUARIO')")
 	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, Integer pagina,
 			Integer tamanho) throws ValidacaoException, GenericoException {
 		try {

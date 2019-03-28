@@ -1,6 +1,15 @@
 package br.com.entequerido.util;
 
 public final class Parametros {
+	/* Strings de Security */
+	public static final String CHAVE_AUTORIZACAO = "CHAVE_AUTORIZACAO";
+	public static final String ABRE_HAS_ANY_ROLE = "hasAnyRole('";
+	public static final String FECHA_HAS_ANY_ROLE = "')";
+	public static final String VIRGULA = ",";
+	
+	public static final String ADMINTRADOR = "ADMINISTRADOR";
+	public static final String USUARIO = "USUARIO";
+	
 	/* Classes em formato String */
 	public static final String RUA = "Rua";
 	public static final String QUADRA = "Quadra";
@@ -28,6 +37,9 @@ public final class Parametros {
 	public static final String CEMITERIO_NOME = "nome";
 	public static final String CEMITERIO_CODIGO = "codigo";
 	
+	public static final String USUARIO_LOGIN = "login";
+	public static final String USUARIO_CODIGO = "codigo";
+	
 	/* codigo das mensagens de parametro no mensagens.properties */
 	public static final String MENSAGEM_SUCESSO_EXCLUIDA = "mensagem.sucesso.excluida";
 	
@@ -46,5 +58,6 @@ public final class Parametros {
 	public static final String MENSAGEM_ERRO_ORDEM_INCORRETA = "mensagem.erro.ordem.incorreta";
 	public static final String MENSAGEM_ERRO_VALIDACAO_M_ATRIBUTO_CLASSE = "mensagem.erro.validacao.m.atributo.classe";
 	public static final String MENSAGEM_ERRO_VALIDACAO_F_ATRIBUTO_CLASSE = "mensagem.erro.validacao.f.atributo.classe";
+	public static final String MENSAGEM_ERRO_TEMPO_EXPIRADO = "mensagem.erro.tempo.expirado";
 	
 }

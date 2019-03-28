@@ -135,6 +135,17 @@ public class Util {
 		return mensagem;
 	}
 	
+	public static final String montarPreAuthorizeHasAnyRole(String... perfis) {
+		StringBuilder sb = new StringBuilder("hasAnyRole('");
+		
+		for (String string : perfis) {
+			sb.append(string);
+		}
+		
+		sb.append("')");
+		return sb.toString();
+	}
+	
 	/** Metodos responsavel por verificar a ordem informada pelo {@link RequestParam}
 	 *
 	 * @Autor: <b> Luis C. G. Sanches <luis.cgs@icloud.com> </b>

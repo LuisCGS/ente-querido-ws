@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
-import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Cemiterio;
 import br.com.entequerido.model.Quadra;
 import br.com.entequerido.repository.CemiterioRepository;
@@ -28,7 +27,7 @@ import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/quadra")
-public class QuadraController implements ControllerInterface {
+public class QuadraController {
 	@Autowired
 	private QuadraRepository quadraRepository;
 	
@@ -86,7 +85,6 @@ public class QuadraController implements ControllerInterface {
 	 * @return {@link ResponseEntity}
 	 * @throws GenericoException 
 	 */
-	@Override
 	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, Integer pagina,
 			Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
@@ -121,7 +119,6 @@ public class QuadraController implements ControllerInterface {
 	 * @throws ValidacaoException
 	 * @throws GenericoException
 	 */
-	@Override
 	public void excluir(String codigo) throws ValidacaoException, GenericoException {
 		try {
 			Optional<Quadra> quadra = quadraRepository.findById(codigo);

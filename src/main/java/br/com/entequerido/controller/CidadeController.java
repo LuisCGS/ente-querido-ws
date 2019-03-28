@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
-import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Cidade;
 import br.com.entequerido.repository.CemiterioRepository;
 import br.com.entequerido.repository.CidadeRepository;
@@ -26,7 +27,7 @@ import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/cidade")
-public class CidadeController implements ControllerInterface {
+public class CidadeController {
 	@Autowired
 	private CidadeRepository cidadeRepository;
 	
@@ -73,7 +74,8 @@ public class CidadeController implements ControllerInterface {
 	 * @throws ValidacaoException
 	 * @throws GenericoException 
 	 */
-	@Override
+	@GetMapping
+	@PreAuthorize(Parametros.ABRE_HAS_ANY_ROLE + Parametros.ADMINTRADOR + Parametros.VIRGULA + Parametros.USUARIO + Parametros.FECHA_HAS_ANY_ROLE)
 	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, 
 			Integer pagina, Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
@@ -107,7 +109,6 @@ public class CidadeController implements ControllerInterface {
 	 * @param codigo : {@link String}
 	 * @throws ValidacaoException, GenericoException 
 	 */
-	@Override
 	public void excluir(String codigo) throws ValidacaoException, GenericoException {
 		try {
 			Optional<Cidade> cidade = cidadeRepository.findById(codigo);

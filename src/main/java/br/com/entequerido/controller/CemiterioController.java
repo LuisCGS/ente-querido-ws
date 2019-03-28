@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
-import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Cemiterio;
 import br.com.entequerido.model.Cidade;
 import br.com.entequerido.repository.CemiterioRepository;
@@ -31,7 +30,7 @@ import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/cemiterio")
-public class CemiterioController implements ControllerInterface{
+public class CemiterioController {
 	@Autowired
 	private CemiterioRepository cemiterioRepository;
 	
@@ -89,7 +88,6 @@ public class CemiterioController implements ControllerInterface{
 	 * @throws GenericoException 
 	 * @throws ValidacaoException
 	 */
-	@Override
 	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, 
 			 Integer pagina, Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
@@ -172,7 +170,6 @@ public class CemiterioController implements ControllerInterface{
 	 * @throws ValidacaoException
 	 * @throws GenericoException
 	 */
-	@Override
 	public void excluir(String codigo) throws ValidacaoException, GenericoException {
 		try {
 			Optional<Cemiterio> cemiterio = cemiterioRepository.findById(codigo);

@@ -26,4 +26,7 @@ public final class Caminhos {
 	/* Caminhos de chamada para a controller de Pessoa */
 	public static final String PESSOA = "/pessoa";
 	
+	/* Caminhos de chamada para a controller de Usuario */
+	public static final String USUARIO = "/usuario";
+	
 }

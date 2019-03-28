@@ -18,7 +18,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.entequerido.model.UserCredentials;
+import br.com.entequerido.model.Usuario;
 import br.com.entequerido.security.service.ServicoAutenticacaoPorToken;
 
 public class JWTFiltroLogin extends AbstractAuthenticationProcessingFilter{
@@ -31,12 +31,12 @@ public class JWTFiltroLogin extends AbstractAuthenticationProcessingFilter{
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
-		UserCredentials usuario = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
+		Usuario usuario = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
 		
 		return getAuthenticationManager().authenticate(
 				new UsernamePasswordAuthenticationToken(
-						usuario.getUsername(), 
-						usuario.getPassword(), 
+						usuario.getLogin(), 
+						usuario.getSenha(), 
 						Collections.<GrantedAuthority>emptyList()
 				)
 		);
@@ -44,6 +44,6 @@ public class JWTFiltroLogin extends AbstractAuthenticationProcessingFilter{
 	
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, 
 			FilterChain chain, Authentication auth) throws IOException, ServletException {
-		ServicoAutenticacaoPorToken.adicionarNoHeaderAutenticacaoPorToken(response, auth.getName());
+		ServicoAutenticacaoPorToken.adicionarNoHeaderAutenticacaoPorToken(response, auth);
 	}
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.entequerido.exception.GenericoException;
 import br.com.entequerido.exception.ValidacaoException;
-import br.com.entequerido.interfaces.ControllerInterface;
 import br.com.entequerido.model.Pessoa;
 import br.com.entequerido.model.Tumulo;
 import br.com.entequerido.repository.PessoaRepository;
@@ -27,7 +26,7 @@ import br.com.entequerido.util.Util;
 
 @RestController
 @RequestMapping("/pessoa")
-public class PessoaController implements ControllerInterface {
+public class PessoaController {
 	@Autowired
 	private TumuloRepository tumuloRepository;
 	
@@ -61,7 +60,6 @@ public class PessoaController implements ControllerInterface {
 		}
 	}
 
-	@Override
 	public ResponseEntity<?> buscarPorNomeOrdenadoEOuPaginado(String nome, String ordem, Integer pagina,
 			Integer tamanho) throws ValidacaoException, GenericoException {
 		try {
@@ -87,7 +85,6 @@ public class PessoaController implements ControllerInterface {
 		}
 	}
 
-	@Override
 	public void excluir(String codigo) throws ValidacaoException, GenericoException {
 		try {
 			Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
