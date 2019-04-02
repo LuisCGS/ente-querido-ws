@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import br.com.entequerido.model.enumeration.SepultamentoEnum;
+//import br.com.entequerido.model.enumeration.SepultamentoEnum;
 
 public class Tumulo extends Generico {
 
@@ -18,7 +18,7 @@ public class Tumulo extends Generico {
 	@NotNull(message="Por favor, informe os dados da rua, ou cadastre uma. Ex.: {'codigo' : '123', 'nome' : 'Rua A'}")
 	private Rua rua;
 	
-	private List<SepultamentoEnum> listaSepultamento;
+//	private List<SepultamentoEnum> listaSepultamento;
 	
 	private List<Pessoa> listaPessoa;
 	
